@@ -1,8 +1,12 @@
 const express = require('express')
 
-const MovieCtrl = require('../controllers/movie-ctrl')
+const MovieCtrl = require('../controllers/movie-ctrl');
+const AuthCtrl = require('../controllers/auth-ctrl');
 
 const router = express.Router()
+
+router.post('/signup', AuthCtrl.signup);
+router.post('/signin', AuthCtrl.signin);
 
 router.post('/movie', MovieCtrl.createMovie)
 router.put('/movie/:id', MovieCtrl.updateMovie)

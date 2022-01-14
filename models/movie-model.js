@@ -7,7 +7,10 @@ const Movie = new Schema(
         time: { type: [String], required: true },
         rating: { type: Number, required: true },
     },
-    { timestamps: true },
+    {
+        timestamps: true,
+        collection: 'movies'
+    },
 )
 
-module.exports = mongoose.model('movies', Movie)
+module.exports = mongoose.model('Movie', Movie)
