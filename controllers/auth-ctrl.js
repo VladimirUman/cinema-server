@@ -36,7 +36,7 @@ signup = (req, res, next) => {
                     });
                 });
             }
-        }).catch(err =>{
+        }).catch(err => {
             res.status(500).json({
                 errors: [{ error: 'Something went wrong' }]
             });
@@ -57,25 +57,27 @@ signin = (req, res) => {
                     return res.status(400).json({ errors: [{ password: 'incorrect' }]});
                 }
 
-                let access_token = createJWT(
-                    user.email,
-                    user._id,
-                    3600
-                );
+                return res.status(200).json({ success: true, data: 'singin success' });
 
-                jwt.verify(access_token, process.env.TOKEN_SECRET, (err, decoded) => {
-                    if (err) {
-                        res.status(500).json({ erros: err });
-                    }
+                // let access_token = createJWT(
+                //     user.email,
+                //     user._id,
+                //     3600
+                // );
 
-                    if (decoded) {
-                        return res.status(200).json({
-                            success: true,
-                            token: access_token,
-                            message: user
-                        });
-                    }
-                });
+                // jwt.verify(access_token, process.env.TOKEN_SECRET, (err, decoded) => {
+                //     if (err) {
+                //         res.status(500).json({ erros: err });
+                //     }
+
+                //     if (decoded) {
+                //         return res.status(200).json({
+                //             success: true,
+                //             token: access_token,
+                //             message: user
+                //         });
+                //     }
+                // });
             }).catch(err => {
                 res.status(500).json({ erros: err });
             });
