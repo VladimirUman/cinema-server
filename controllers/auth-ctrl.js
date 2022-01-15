@@ -3,8 +3,34 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { createJWT } = require('../utils/auth');
 
+const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
 signup = (req, res, next) => {
     let { name, email, password, password_confirmation } = req.body;
+
+    let validationErrors = [];
+
+    if (!name) {
+        validationErrors.push({ name: "required" });
+    }
+    if (!email) {
+        validationErrors.push({ email: "required" });
+    }
+    if (!emailRegexp.test(email)) {
+        validationErrors.push({ email: "invalid" });
+    }
+    if (!password) {
+        validationErrors.push({ password: "required" });
+    }
+    if (!password_confirmation) {
+        validationErrors.push({ password_confirmation: "required" });
+    }
+    if (password != password_confirmation) {
+        validationErrors.push({ password: "mismatch" });
+    }
+    if (validationErrors.length > 0) {
+        return res.status(422).json({ errors: validationErrors });
+    }
 
     User.findOne({email: email})
         .then(user => {
@@ -46,6 +72,21 @@ signup = (req, res, next) => {
 signin = (req, res) => {
     let { email, password } = req.body;
 
+    let validationErrors = [];
+
+    if (!email) {
+        validationErrors.push({ email: "required" });
+    }
+    if (!emailRegexp.test(email)) {
+        validationErrors.push({ email: "invalid email" });
+    }
+    if (!password) {
+        validationErrors.push({ passowrd: "required" });
+    }
+    if (validationErrors.length > 0) {
+        return res.status(422).json({ errors: validationErrors });
+    }
+
     User.findOne({ email: email }).then(user => {
         if (!user) {
             return res.status(404).json({
@@ -57,27 +98,25 @@ signin = (req, res) => {
                     return res.status(400).json({ errors: [{ password: 'incorrect' }]});
                 }
 
-                return res.status(200).json({ success: true, data: 'singin success' });
+                let access_token = createJWT(
+                    user.email,
+                    user._id,
+                    3600
+                );
 
-                // let access_token = createJWT(
-                //     user.email,
-                //     user._id,
-                //     3600
-                // );
+                jwt.verify(access_token, process.env.TOKEN_SECRET, (err, decoded) => {
+                    if (err) {
+                        res.status(500).json({ erros: err });
+                    }
 
-                // jwt.verify(access_token, process.env.TOKEN_SECRET, (err, decoded) => {
-                //     if (err) {
-                //         res.status(500).json({ erros: err });
-                //     }
-
-                //     if (decoded) {
-                //         return res.status(200).json({
-                //             success: true,
-                //             token: access_token,
-                //             message: user
-                //         });
-                //     }
-                // });
+                    if (decoded) {
+                        return res.status(200).json({
+                            success: true,
+                            token: access_token,
+                            message: user
+                        });
+                    }
+                });
             }).catch(err => {
                 res.status(500).json({ erros: err });
             });
