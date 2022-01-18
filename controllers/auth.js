@@ -6,20 +6,29 @@ const bcrypt = require('bcrypt');
 
 const User = require('../models/user');
 const Session = require('../models/session');
-const { loginValidator } = require('./vlidations/auth');
+const { loginValidator, registrationValidator } = require('./vlidations/auth');
 const { createJWT } = require('../utils/auth');
 const { sendConfirmToken } = require('../utils/mailer');
 
 class AuthController {
     get router() {
         router.post('/auth/login', loginValidator, this.login);
-        router.post('/auth/registration', this.registraition);
+        router.post(
+            '/auth/registration',
+            registrationValidator,
+            this.registraition
+        );
 
         return router;
     }
 
     registraition(req, res) {
         let { name, email, password } = req.body;
+
+        const validationErrors = validationResult(req);
+        if (!validationErrors.isEmpty()) {
+            return res.status(400).json({ errors: validationErrors.array() });
+        }
 
         User.findOne({ email: email })
             .then((user) => {
