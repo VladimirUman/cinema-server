@@ -18,6 +18,7 @@ class AuthController {
             registrationValidator,
             this.registraition
         );
+        router.post('/auth/confirm-email', this.confirmRegistraition);
 
         return router;
     }
@@ -79,6 +80,49 @@ class AuthController {
                 res.status(500).json({
                     errors: [{ error: 'Something went wrong' }]
                 });
+            });
+    }
+
+    confirmRegistraition(req, res) {
+        let { emailConfirmToken } = req.body;
+
+        const tokenData = jwt.verify(
+            emailConfirmToken,
+            process.env.TOKEN_SECRET
+        );
+        const { userId } = tokenData;
+
+        User.findOne({ _id: userId })
+            .then((user) => {
+                if (!user) {
+                    return res.status(404).json({
+                        errors: [{ user: 'not found' }]
+                    });
+                } else {
+                    if (user.emailConfirmToken !== emailConfirmToken) {
+                        return res.status(400).json({
+                            errors: [{ token: 'incorrect' }]
+                        });
+                    } else {
+                        user.emailConfirmToken = null;
+
+                        user.save()
+                            .then((response) => {
+                                res.status(200).json({
+                                    success: true,
+                                    result: response
+                                });
+                            })
+                            .catch((err) => {
+                                res.status(500).json({
+                                    errors: [{ error: err }]
+                                });
+                            });
+                    }
+                }
+            })
+            .catch((err) => {
+                res.status(500).json({ erros: err });
             });
     }
 
