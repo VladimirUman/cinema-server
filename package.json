@@ -1,7 +1,6 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -17,7 +16,16 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.2",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.1.6",
+    "mongoose": "^6.1.7",
     "nodemon": "^2.0.15"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VladimirUman/cinema-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/VladimirUman/cinema-server/issues"
+  },
+  "homepage": "https://github.com/VladimirUman/cinema-server#readme",
+  "description": ""
 }
