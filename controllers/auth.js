@@ -8,6 +8,7 @@ const User = require('../models/user');
 const Session = require('../models/session');
 const { loginValidator } = require('./vlidations/auth');
 const { createJWT } = require('../utils/auth');
+const { sendConfirmToken } = require('../utils/mailer');
 
 class AuthController {
     get router() {
@@ -18,7 +19,7 @@ class AuthController {
     }
 
     registraition(req, res) {
-        let { name, email, password, password_confirmation } = req.body;
+        let { name, email, password } = req.body;
 
         User.findOne({ email: email })
             .then((user) => {
@@ -38,20 +39,31 @@ class AuthController {
                             if (err) throw err;
 
                             user.password = hash;
-                            user.save()
-                                .then((response) => {
-                                    res.status(200).json({
-                                        success: true,
-                                        result: response
-                                    });
-                                })
-                                .catch((err) => {
-                                    res.status(500).json({
-                                        errors: [{ error: err }]
-                                    });
-                                });
                         });
                     });
+
+                    let emailConfirmToken = createJWT(
+                        user.email,
+                        user._id,
+                        3600
+                    );
+
+                    user.emailConfirmToken = emailConfirmToken;
+
+                    user.save()
+                        .then((response) => {
+                            sendConfirmToken(email, name, emailConfirmToken);
+
+                            res.status(200).json({
+                                success: true,
+                                result: response
+                            });
+                        })
+                        .catch((err) => {
+                            res.status(500).json({
+                                errors: [{ error: err }]
+                            });
+                        });
                 }
             })
             .catch((err) => {
@@ -93,14 +105,14 @@ class AuthController {
                                 });
                             }
 
-                            let access_token = createJWT(
+                            let accessToken = createJWT(
                                 user.email,
                                 user._id,
                                 3600
                             );
 
                             jwt.verify(
-                                access_token,
+                                accessToken,
                                 process.env.TOKEN_SECRET,
                                 (err, decoded) => {
                                     if (err) {
