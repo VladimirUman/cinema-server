@@ -23,7 +23,7 @@ class AuthController {
         return router;
     }
 
-    registraition(req, res) {
+    static registraition(req, res) {
         let { name, email, password } = req.body;
 
         const validationErrors = validationResult(req);
@@ -87,7 +87,7 @@ class AuthController {
             });
     }
 
-    confirmRegistration(req, res) {
+    static confirmRegistration(req, res) {
         let { emailConfirmToken } = req.body;
 
         const tokenData = jwt.verify(
@@ -130,7 +130,7 @@ class AuthController {
             });
     }
 
-    login(req, res) {
+    static login(req, res) {
         let { email, password } = req.body;
 
         const validationErrors = validationResult(req);
