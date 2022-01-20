@@ -23,7 +23,7 @@ class UsersController {
             });
         }
 
-        const user = new Movie(body);
+        const user = new User(body);
 
         if (!user) {
             return res.status(400).json({ success: false, error: err });
@@ -63,6 +63,9 @@ class UsersController {
                 });
             }
             user.name = body.name;
+            user.lastName = body.lastName;
+
+            user.email = body.email;
 
             user.save()
                 .then(() => {
