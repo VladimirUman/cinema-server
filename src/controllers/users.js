@@ -63,8 +63,6 @@ class UsersController {
                 });
             }
             user.name = body.name;
-            user.lastName = body.lastName;
-
             user.email = body.email;
 
             user.save()
