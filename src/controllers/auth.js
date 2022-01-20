@@ -10,112 +10,86 @@ const { sendConfirmToken } = require('../utils/mailer');
 const { SessionService } = require('../services/session');
 
 class AuthController {
-    static registraition(req, res) {
-        let { name, lastName, email, password } = req.body;
+    static async registraition(req, res) {
+        let { name, email, password } = req.body;
 
         const validationErrors = validationResult(req);
         if (!validationErrors.isEmpty()) {
             return res.status(400).json({ errors: validationErrors.array() });
         }
 
-        User.findOne({ email: email })
-            .then((user) => {
-                if (user) {
-                    return res
-                        .status(422)
-                        .json({ errors: [{ user: 'email already exists' }] });
-                } else {
-                    const user = new User({
-                        name: name,
-                        lastName: lastName,
-                        email: email,
-                        password: password
-                    });
+        try {
+            const user = await User.findOne({ email: email });
 
-                    bcrypt.genSalt(10, function (err, salt) {
-                        bcrypt.hash(password, salt, function (err, hash) {
-                            if (err) throw err;
-
-                            user.password = hash;
-
-                            let emailConfirmToken = createJWT(
-                                user.email,
-                                user._id,
-                                3600
-                            );
-
-                            user.emailConfirmToken = emailConfirmToken;
-
-                            user.save()
-                                .then((response) => {
-                                    sendConfirmToken(
-                                        email,
-                                        name,
-                                        emailConfirmToken
-                                    );
-
-                                    res.status(200).json({
-                                        success: true,
-                                        result: response
-                                    });
-                                })
-                                .catch((err) => {
-                                    res.status(500).json({
-                                        errors: [{ error: err }]
-                                    });
-                                });
-                        });
-                    });
-                }
-            })
-            .catch((err) => {
-                res.status(500).json({
-                    errors: [{ error: 'Something went wrong' }]
+            if (user) {
+                return res.status(422).json({
+                    errors: [{ user: 'email already exists' }]
                 });
-            });
+            } else {
+                const user = new User({
+                    name: name,
+                    email: email,
+                    password: password
+                });
+
+                user.password = await bcrypt.hash(password, 10);
+
+                let emailConfirmToken = createJWT(user.email, user._id, 3600);
+
+                user.emailConfirmToken = emailConfirmToken;
+
+                await user.save();
+
+                sendConfirmToken(email, name, emailConfirmToken);
+
+                return res.status(200).json({
+                    success: true,
+                    userId: user._id,
+                    userName: user.name
+                });
+            }
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
     }
 
-    static confirmRegistration(req, res) {
+    static async confirmRegistration(req, res) {
         let { emailConfirmToken } = req.body;
 
         const tokenData = jwt.verify(
             emailConfirmToken,
             process.env.TOKEN_SECRET
         );
-        const { userId } = tokenData;
 
-        User.findOne({ _id: userId })
-            .then((user) => {
-                if (!user) {
-                    return res.status(404).json({
-                        errors: [{ user: 'not found' }]
+        const userId = tokenData.userId;
+
+        try {
+            const user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                return res.status(404).json({
+                    errors: [{ user: 'not found' }]
+                });
+            } else {
+                if (user.emailConfirmToken !== emailConfirmToken) {
+                    return res.status(400).json({
+                        errors: [{ token: 'incorrect' }]
                     });
                 } else {
-                    if (user.emailConfirmToken !== emailConfirmToken) {
-                        return res.status(400).json({
-                            errors: [{ token: 'incorrect' }]
-                        });
-                    } else {
-                        user.emailConfirmToken = null;
+                    user.emailConfirmToken = null;
 
-                        user.save()
-                            .then((response) => {
-                                res.status(200).json({
-                                    success: true,
-                                    result: response
-                                });
-                            })
-                            .catch((err) => {
-                                res.status(500).json({
-                                    errors: [{ error: err }]
-                                });
-                            });
-                    }
+                    await user.save();
+
+                    return res.status(200).json({
+                        success: true,
+                        userId: user.id
+                    });
                 }
-            })
-            .catch((err) => {
-                res.status(500).json({ erros: err });
-            });
+            }
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ errors: err });
+        }
     }
 
     static async login(req, res) {
