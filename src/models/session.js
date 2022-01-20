@@ -14,14 +14,6 @@ const Session = new Schema(
         expiresIn: {
             type: Number,
             required: true
-        },
-        fingerprint: {
-            type: String,
-            required: true
-        },
-        ua: {
-            type: String,
-            required: true
         }
     },
     {
