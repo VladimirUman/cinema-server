@@ -11,7 +11,7 @@ const { SessionService } = require('../services/session');
 
 class AuthController {
     static registraition(req, res) {
-        let { name, email, password } = req.body;
+        let { name, lastName, email, password } = req.body;
 
         const validationErrors = validationResult(req);
         if (!validationErrors.isEmpty()) {
@@ -27,6 +27,7 @@ class AuthController {
                 } else {
                     const user = new User({
                         name: name,
+                        lastName: lastName,
                         email: email,
                         password: password
                     });
