@@ -75,54 +75,60 @@ class UsersController {
     }
 
     static async deleteUser(req, res) {
-        await User.findOneAndDelete({ _id: req.params.id }, (err, user) => {
-            if (err) {
-                return res.status(400).json({ success: false, error: err });
-            }
+        try {
+            await User.findOneAndDelete({ _id: req.params.id }, (err, user) => {
+                if (err) {
+                    return res.status(400).json({ success: false, error: err });
+                }
 
-            if (!user) {
-                return res
-                    .status(404)
-                    .json({ success: false, error: `User not found` });
-            }
+                if (!user) {
+                    return res
+                        .status(404)
+                        .json({ success: false, error: `User not found` });
+                }
 
-            return res.status(200).json({ success: true, data: user });
-        })
-            .clone()
-            .catch((err) => console.log(err));
+                return res.status(200).json({ success: true, data: user });
+            });
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
     }
 
     static async getUserById(req, res) {
-        await User.findOne({ _id: req.params.id }, (err, user) => {
-            if (err) {
-                return res.status(400).json({ success: false, error: err });
-            }
+        try {
+            await User.findOne({ _id: req.params.id }, (err, user) => {
+                if (err) {
+                    return res.status(400).json({ success: false, error: err });
+                }
 
-            if (!user) {
-                return res
-                    .status(404)
-                    .json({ success: false, error: `User not found` });
-            }
-            return res.status(200).json({ success: true, data: user });
-        })
-            .clone()
-            .catch((err) => console.log(err));
+                if (!user) {
+                    return res
+                        .status(404)
+                        .json({ success: false, error: `User not found` });
+                }
+                return res.status(200).json({ success: true, data: user });
+            });
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
     }
 
     static async getUsers(req, res) {
-        await User.find({}, (err, users) => {
-            if (err) {
-                return res.status(400).json({ success: false, error: err });
-            }
-            if (!users.length) {
-                return res
-                    .status(404)
-                    .json({ success: false, error: `User not found` });
-            }
-            return res.status(200).json({ success: true, data: users });
-        })
-            .clone()
-            .catch((err) => console.log(err));
+        try {
+            await User.find({}, (err, users) => {
+                if (err) {
+                    return res.status(400).json({ success: false, error: err });
+                }
+                if (!users.length) {
+                    return res
+                        .status(404)
+                        .json({ success: false, error: `User not found` });
+                }
+                return res.status(200).json({ success: true, data: users });
+            });
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
     }
 }
 
