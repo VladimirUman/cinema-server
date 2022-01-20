@@ -3,17 +3,7 @@ const router = require('express').Router();
 const User = require('../models/user');
 
 class UsersController {
-    get router() {
-        router.post('/user', this.createUser);
-        router.put('/user/:id', this.updateUser);
-        router.delete('/user/:id', this.deleteUser);
-        router.get('/user/:id', this.getUserById);
-        router.get('/users', this.getUsers);
-
-        return router;
-    }
-
-    createUser(req, res) {
+    static createUser(req, res) {
         const body = req.body;
 
         if (!body) {
@@ -45,7 +35,7 @@ class UsersController {
             });
     }
 
-    async updateUser(req, res) {
+    static async updateUser(req, res) {
         const body = req.body;
 
         if (!body) {
@@ -63,6 +53,7 @@ class UsersController {
                 });
             }
             user.name = body.name;
+
             user.email = body.email;
 
             user.save()
@@ -82,7 +73,7 @@ class UsersController {
         });
     }
 
-    async deleteUser(req, res) {
+    static async deleteUser(req, res) {
         await User.findOneAndDelete({ _id: req.params.id }, (err, user) => {
             if (err) {
                 return res.status(400).json({ success: false, error: err });
@@ -100,7 +91,7 @@ class UsersController {
             .catch((err) => console.log(err));
     }
 
-    async getUserById(req, res) {
+    static async getUserById(req, res) {
         await User.findOne({ _id: req.params.id }, (err, user) => {
             if (err) {
                 return res.status(400).json({ success: false, error: err });
@@ -117,7 +108,7 @@ class UsersController {
             .catch((err) => console.log(err));
     }
 
-    async getUsers(req, res) {
+    static async getUsers(req, res) {
         await User.find({}, (err, users) => {
             if (err) {
                 return res.status(400).json({ success: false, error: err });
