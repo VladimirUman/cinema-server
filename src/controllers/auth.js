@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const { validationResult } = require('express-validator');
@@ -6,23 +5,11 @@ const bcrypt = require('bcrypt');
 
 const User = require('../models/user');
 const Session = require('../models/session');
-const { loginValidator, registrationValidator } = require('./vlidations/auth');
 const { createJWT } = require('../utils/auth');
 const { sendConfirmToken } = require('../utils/mailer');
+const { SessionService } = require('../services/session');
 
 class AuthController {
-    get router() {
-        router.post('/auth/login', loginValidator, this.login);
-        router.post(
-            '/auth/registration',
-            registrationValidator,
-            this.registraition
-        );
-        router.post('/auth/confirm-email', this.confirmRegistration);
-
-        return router;
-    }
-
     static registraition(req, res) {
         let { name, email, password } = req.body;
 
@@ -130,7 +117,7 @@ class AuthController {
             });
     }
 
-    static login(req, res) {
+    static async login(req, res) {
         let { email, password } = req.body;
 
         const validationErrors = validationResult(req);
@@ -138,54 +125,50 @@ class AuthController {
             return res.status(400).json({ errors: validationErrors.array() });
         }
 
-        User.findOne({ email: email })
-            .then((user) => {
-                if (!user) {
-                    return res.status(404).json({
-                        errors: [{ user: 'not found' }]
-                    });
-                } else {
-                    bcrypt.compare(password, user.password).then((isMatch) => {
-                        if (!isMatch) {
-                            return res.status(400).json({
-                                errors: [{ password: 'incorrect' }]
-                            });
-                        }
+        try {
+            const user = await User.findOne({ email: email });
 
-                        const accessToken = createJWT(
-                            user.email,
-                            user._id,
-                            3600
-                        );
-
-                        const newRefreshSession = new Session({
-                            refreshToken: uuidv4(),
-                            userId: user.id,
-                            expiresIn:
-                                new Date().getTime() +
-                                process.env.TOKEN_REFRESH_EXP * 1000
-                        });
-
-                        newRefreshSession
-                            .save()
-                            .then(() => {
-                                return res.status(200).json({
-                                    success: true,
-                                    accessToken: accessToken,
-                                    refreshToken:
-                                        newRefreshSession.refreshToken,
-                                    message: user
-                                });
-                            })
-                            .catch((err) => {
-                                res.status(500).json({ errors: err });
-                            });
+            if (!user) {
+                return res.status(404).json({
+                    errors: [{ user: 'not found' }]
+                });
+            } else {
+                if (user.emailConfirmToken) {
+                    return res.status(403).json({
+                        errors: [{ user: 'finish registration' }]
                     });
                 }
-            })
-            .catch((err) => {
-                res.status(500).json({ errors: err });
-            });
+
+                const isMatch = bcrypt.compare(password, user.password);
+
+                if (!isMatch) {
+                    return res.status(400).json({
+                        errors: [{ password: 'incorrect' }]
+                    });
+                }
+
+                const accessToken = createJWT(user.email, user._id, 3600);
+
+                const newRefreshSession = new Session({
+                    refreshToken: uuidv4(),
+                    userId: user.id,
+                    expiresIn:
+                        new Date().getTime() +
+                        process.env.TOKEN_REFRESH_EXP * 1000
+                });
+
+                await SessionService.addRefreshSession(newRefreshSession);
+
+                return res.status(200).json({
+                    success: true,
+                    accessToken: accessToken,
+                    refreshToken: newRefreshSession.refreshToken,
+                    message: user
+                });
+            }
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
     }
 }
 

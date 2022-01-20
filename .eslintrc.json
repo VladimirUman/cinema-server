@@ -1,11 +1,19 @@
 {
-  "env": {
-    "browser": true,
-    "commonjs": true,
-    "es2021": true
-  },
-  "parserOptions": {
-    "ecmaVersion": "latest"
-  },
-  "rules": {}
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+        "no-console": 0,
+        "no-param-reassign": ["error", { "props": false }],
+        "prefer-destructuring": 0,
+        // "consistent-return": ["warn", { "treatUndefinedAsUnspecified": true }],
+        // "arrow-body-style": 0,
+        "comma-dangle": 0,
+        "node/no-unsupported-features/es-syntax": "off"
+    }
 }
