@@ -6,13 +6,15 @@ class MoviesController {
         const movie = new Movie(req.body);
 
         try {
-            await MovieService.create(movie);
+            const newMovie = await MovieService.create(movie);
 
-            return res.status(201).json({
+            const result = {
                 success: true,
-                id: movie._id,
+                movie: newMovie,
                 message: 'Movie created!'
-            });
+            };
+
+            return res.status(201).json(result);
         } catch (err) {
             return res.status(500).json({ errors: err });
         }
@@ -35,13 +37,15 @@ class MoviesController {
             movie.time = body.time;
             movie.rating = body.rating;
 
-            await MovieService.update(movie);
+            const updatedMovie = await MovieService.update(movie);
 
-            return res.status(200).json({
+            const result = {
                 success: true,
-                id: movie._id,
+                movie: updatedMovie,
                 message: 'Movie updated!'
-            });
+            };
+
+            return res.status(200).json(result);
         } catch (err) {
             return res.status(500).json({ errors: err });
         }
@@ -59,11 +63,13 @@ class MoviesController {
 
             await MovieService.delete(movie._id);
 
-            return res.status(200).json({
+            const result = {
                 success: true,
                 id: movie._id,
                 message: 'Movie deleted!'
-            });
+            };
+
+            return res.status(200).json(result);
         } catch (err) {
             return res.status(500).json({ errors: err });
         }

@@ -10,11 +10,13 @@ class MovieService {
     }
 
     static async create(movie) {
-        await movie.save();
+        return await Movie.create(movie);
     }
 
     static async update(movie) {
-        await movie.save();
+        return await Movie.findOneAndUpdate({ _id: movie._id }, movie, {
+            new: true
+        });
     }
 
     static async delete(movieId) {
