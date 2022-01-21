@@ -1,84 +1,55 @@
-const router = require('express').Router();
-
 const Movie = require('../models/movie');
+const { MovieService } = require('../services/movie');
 
 class MoviesController {
     static async createMovie(req, res) {
-        const body = req.body;
+        const movie = new Movie(req.body);
 
-        if (!body) {
-            return res.status(400).json({
-                success: false,
-                error: 'You must provide a movie'
+        try {
+            await MovieService.create(movie);
+
+            return res.status(201).json({
+                success: true,
+                id: movie._id,
+                message: 'Movie created!'
             });
+        } catch (err) {
+            return res.status(500).json({ errors: err });
         }
-
-        const movie = new Movie(body);
-
-        if (!movie) {
-            return res.status(400).json({ success: false, error: err });
-        }
-
-        movie
-            .save()
-            .then(() => {
-                return res.status(201).json({
-                    success: true,
-                    id: movie._id,
-                    message: 'Movie created!'
-                });
-            })
-            .catch((error) => {
-                return res.status(400).json({
-                    error,
-                    message: 'Movie not created!'
-                });
-            });
     }
 
     static async updateMovie(req, res) {
         const body = req.body;
 
-        if (!body) {
-            return res.status(400).json({
-                success: false,
-                error: 'You must provide a body to update'
-            });
-        }
+        try {
+            const movie = await MovieService.findById(req.params.id);
 
-        Movie.findOne({ _id: req.params.id }, (err, movie) => {
-            if (err) {
+            if (!movie) {
                 return res.status(404).json({
                     err,
                     message: 'Movie not found!'
                 });
             }
+
             movie.name = body.name;
             movie.time = body.time;
             movie.rating = body.rating;
-            movie
-                .save()
-                .then(() => {
-                    return res.status(200).json({
-                        success: true,
-                        id: movie._id,
-                        message: 'Movie updated!'
-                    });
-                })
-                .catch((error) => {
-                    return res.status(404).json({
-                        error,
-                        message: 'Movie not updated!'
-                    });
-                });
-        });
+
+            await MovieService.update(movie);
+
+            return res.status(200).json({
+                success: true,
+                id: movie._id,
+                message: 'Movie updated!'
+            });
+        } catch (err) {
+            return res.status(500).json({ errors: err });
+        }
     }
 
     static async deleteMovie(req, res) {
-        await Movie.findOneAndDelete({ _id: req.params.id }, (err, movie) => {
-            if (err) {
-                return res.status(400).json({ success: false, error: err });
-            }
+        try {
+            const movie = await MovieService.findById(req.params.id);
 
             if (!movie) {
                 return res
@@ -86,43 +57,47 @@ class MoviesController {
                     .json({ success: false, error: `Movie not found` });
             }
 
-            return res.status(200).json({ success: true, data: movie });
-        })
-            .clone()
-            .catch((err) => console.log(err));
+            await MovieService.delete(movie._id);
+
+            return res.status(200).json({
+                success: true,
+                id: movie._id,
+                message: 'Movie deleted!'
+            });
+        } catch (err) {
+            return res.status(500).json({ errors: err });
+        }
     }
 
     static async getMovieById(req, res) {
-        await Movie.findOne({ _id: req.params.id }, (err, movie) => {
-            if (err) {
-                return res.status(400).json({ success: false, error: err });
-            }
-
+        try {
+            const movie = await MovieService.findById(req.params.id);
             if (!movie) {
                 return res
                     .status(404)
                     .json({ success: false, error: `Movie not found` });
             }
+
             return res.status(200).json({ success: true, data: movie });
-        })
-            .clone()
-            .catch((err) => console.log(err));
+        } catch (err) {
+            return res.status(500).json({ errors: err });
+        }
     }
 
     static async getMovies(req, res) {
-        await Movie.find({}, (err, movies) => {
-            if (err) {
-                return res.status(400).json({ success: false, error: err });
-            }
+        try {
+            const movies = await MovieService.getAll();
+
             if (!movies.length) {
                 return res
                     .status(404)
                     .json({ success: false, error: `Movie not found` });
             }
+
             return res.status(200).json({ success: true, data: movies });
-        })
-            .clone()
-            .catch((err) => console.log(err));
+        } catch (err) {
+            return res.status(500).json({ errors: err });
+        }
     }
 }
 
