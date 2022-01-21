@@ -76,19 +76,14 @@ class UsersController {
 
     static async deleteUser(req, res) {
         try {
-            await User.findOneAndDelete({ _id: req.params.id }, (err, user) => {
-                if (err) {
-                    return res.status(400).json({ success: false, error: err });
-                }
+            const user = await User.findOneAndDelete({});
+            if (!user) {
+                return res
+                    .status(404)
+                    .json({ success: false, error: `User not found` });
+            }
 
-                if (!user) {
-                    return res
-                        .status(404)
-                        .json({ success: false, error: `User not found` });
-                }
-
-                return res.status(200).json({ success: true, data: user });
-            });
+            return res.status(200).json({ success: true, data: user });
         } catch (err) {
             res.status(500).json({ errors: err });
         }
@@ -96,18 +91,13 @@ class UsersController {
 
     static async getUserById(req, res) {
         try {
-            await User.findOne({ _id: req.params.id }, (err, user) => {
-                if (err) {
-                    return res.status(400).json({ success: false, error: err });
-                }
-
-                if (!user) {
-                    return res
-                        .status(404)
-                        .json({ success: false, error: `User not found` });
-                }
-                return res.status(200).json({ success: true, data: user });
-            });
+            const user = await User.findOne({});
+            if (!user) {
+                return res
+                    .status(404)
+                    .json({ success: false, error: `User not found` });
+            }
+            return res.status(200).json({ success: true, data: user });
         } catch (err) {
             res.status(500).json({ errors: err });
         }
@@ -115,17 +105,14 @@ class UsersController {
 
     static async getUsers(req, res) {
         try {
-            await User.find({}, (err, users) => {
-                if (err) {
-                    return res.status(400).json({ success: false, error: err });
-                }
-                if (!users.length) {
-                    return res
-                        .status(404)
-                        .json({ success: false, error: `User not found` });
-                }
-                return res.status(200).json({ success: true, data: users });
-            });
+            const users = await User.find({});
+
+            if (!users.length) {
+                return res
+                    .status(404)
+                    .json({ success: false, error: `User not found` });
+            }
+            return res.status(200).json({ success: true, data: users });
         } catch (err) {
             res.status(500).json({ errors: err });
         }
