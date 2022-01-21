@@ -3,17 +3,7 @@ const router = require('express').Router();
 const Movie = require('../models/movie');
 
 class MoviesController {
-    get router() {
-        router.post('/movie', this.createMovie);
-        router.put('/movie/:id', this.updateMovie);
-        router.delete('/movie/:id', this.deleteMovie);
-        router.get('/movie/:id', this.getMovieById);
-        router.get('/movies', this.getMovies);
-
-        return router;
-    }
-
-    createMovie(req, res) {
+    static async createMovie(req, res) {
         const body = req.body;
 
         if (!body) {
@@ -46,7 +36,7 @@ class MoviesController {
             });
     }
 
-    async updateMovie(req, res) {
+    static async updateMovie(req, res) {
         const body = req.body;
 
         if (!body) {
@@ -84,7 +74,7 @@ class MoviesController {
         });
     }
 
-    async deleteMovie(req, res) {
+    static async deleteMovie(req, res) {
         await Movie.findOneAndDelete({ _id: req.params.id }, (err, movie) => {
             if (err) {
                 return res.status(400).json({ success: false, error: err });
@@ -102,7 +92,7 @@ class MoviesController {
             .catch((err) => console.log(err));
     }
 
-    async getMovieById(req, res) {
+    static async getMovieById(req, res) {
         await Movie.findOne({ _id: req.params.id }, (err, movie) => {
             if (err) {
                 return res.status(400).json({ success: false, error: err });
@@ -119,7 +109,7 @@ class MoviesController {
             .catch((err) => console.log(err));
     }
 
-    async getMovies(req, res) {
+    static async getMovies(req, res) {
         await Movie.find({}, (err, movies) => {
             if (err) {
                 return res.status(400).json({ success: false, error: err });
