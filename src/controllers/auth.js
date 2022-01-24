@@ -7,13 +7,14 @@ const Session = require('../models/session');
 const { createJWT } = require('../utils/auth');
 const { sendConfirmToken } = require('../utils/mailer');
 const { SessionService } = require('../services/session');
+const { UserService } = require('../services/user');
 
 class AuthController {
     static async registraition(req, res) {
         const { name, lastName, email, password } = req.body;
 
         try {
-            const user = await User.findOne({ email: email });
+            const user = await UserService.findByEmail(email);
 
             if (user) {
                 return res.status(422).json({
@@ -33,14 +34,14 @@ class AuthController {
 
                 user.emailConfirmToken = emailConfirmToken;
 
-                await user.save();
+                const newUser = await UserService.createUser(user);
 
                 sendConfirmToken(email, name, emailConfirmToken);
 
                 return res.status(200).json({
                     success: true,
-                    userId: user._id,
-                    userName: user.name
+                    userId: newUser._id,
+                    userName: newUser.name
                 });
             }
         } catch (err) {
@@ -56,7 +57,7 @@ class AuthController {
         const userId = tokenData.userId;
 
         try {
-            const user = await User.findOne({ _id: userId });
+            const user = await UserService.findById(userId);
 
             if (!user) {
                 return res.status(404).json({
@@ -70,7 +71,7 @@ class AuthController {
                 } else {
                     user.emailConfirmToken = null;
 
-                    await user.save();
+                    await UserService.updateUser(user);
 
                     return res.status(200).json({
                         success: true,
@@ -88,7 +89,7 @@ class AuthController {
         const { email, password } = req.body;
 
         try {
-            const user = await User.findOne({ email: email });
+            const user = await UserService.findByEmail(email);
 
             if (!user) {
                 return res.status(404).json({
