@@ -12,6 +12,10 @@ class SessionService {
 
         await refreshSession.save();
     }
+
+    static async removeRefreshSession(refreshToken) {
+        Session.remove({ refreshToken: refreshToken });
+    }
 }
 
 module.exports = { SessionService };
