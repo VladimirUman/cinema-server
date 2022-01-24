@@ -10,7 +10,7 @@ const { SessionService } = require('../services/session');
 
 class AuthController {
     static async registraition(req, res) {
-        let { name, email, password } = req.body;
+        const { name, lastName, email, password } = req.body;
 
         try {
             const user = await User.findOne({ email: email });
@@ -22,6 +22,7 @@ class AuthController {
             } else {
                 const user = new User({
                     name: name,
+                    lastName: lastName,
                     email: email,
                     password: password
                 });
@@ -48,7 +49,7 @@ class AuthController {
     }
 
     static async confirmRegistration(req, res) {
-        let { emailConfirmToken } = req.body;
+        const { emailConfirmToken } = req.body;
 
         const tokenData = jwt.verify(emailConfirmToken, process.env.TOKEN_SECRET);
 
@@ -84,7 +85,7 @@ class AuthController {
     }
 
     static async login(req, res) {
-        let { email, password } = req.body;
+        const { email, password } = req.body;
 
         try {
             const user = await User.findOne({ email: email });
