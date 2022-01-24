@@ -56,12 +56,10 @@ class MoviesController {
             const movie = await MovieService.findById(req.params.id);
 
             if (!movie) {
-                return res
-                    .status(404)
-                    .json({ success: false, error: `Movie not found` });
+                return res.status(404).json({ success: false, error: `Movie not found` });
             }
 
-            await MovieService.delete(movie._id);
+            MovieService.delete(movie._id);
 
             const result = {
                 success: true,
@@ -79,9 +77,7 @@ class MoviesController {
         try {
             const movie = await MovieService.findById(req.params.id);
             if (!movie) {
-                return res
-                    .status(404)
-                    .json({ success: false, error: `Movie not found` });
+                return res.status(404).json({ success: false, error: `Movie not found` });
             }
 
             return res.status(200).json({ success: true, data: movie });
@@ -95,9 +91,7 @@ class MoviesController {
             const movies = await MovieService.getAll();
 
             if (!movies.length) {
-                return res
-                    .status(404)
-                    .json({ success: false, error: `Movie not found` });
+                return res.status(404).json({ success: false, error: `Movie not found` });
             }
 
             return res.status(200).json({ success: true, data: movies });

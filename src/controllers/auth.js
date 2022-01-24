@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const User = require('../models/user');
@@ -12,11 +11,6 @@ const { SessionService } = require('../services/session');
 class AuthController {
     static async registraition(req, res) {
         let { name, email, password } = req.body;
-
-        const validationErrors = validationResult(req);
-        if (!validationErrors.isEmpty()) {
-            return res.status(400).json({ errors: validationErrors.array() });
-        }
 
         try {
             const user = await User.findOne({ email: email });
@@ -56,10 +50,7 @@ class AuthController {
     static async confirmRegistration(req, res) {
         let { emailConfirmToken } = req.body;
 
-        const tokenData = jwt.verify(
-            emailConfirmToken,
-            process.env.TOKEN_SECRET
-        );
+        const tokenData = jwt.verify(emailConfirmToken, process.env.TOKEN_SECRET);
 
         const userId = tokenData.userId;
 
@@ -95,11 +86,6 @@ class AuthController {
     static async login(req, res) {
         let { email, password } = req.body;
 
-        const validationErrors = validationResult(req);
-        if (!validationErrors.isEmpty()) {
-            return res.status(400).json({ errors: validationErrors.array() });
-        }
-
         try {
             const user = await User.findOne({ email: email });
 
@@ -127,9 +113,7 @@ class AuthController {
                 const newRefreshSession = new Session({
                     refreshToken: uuidv4(),
                     userId: user.id,
-                    expiresIn:
-                        new Date().getTime() +
-                        process.env.TOKEN_REFRESH_EXP * 1000
+                    expiresIn: new Date().getTime() + process.env.TOKEN_REFRESH_EXP * 1000
                 });
 
                 await SessionService.addRefreshSession(newRefreshSession);

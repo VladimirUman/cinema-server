@@ -1,8 +1,8 @@
 const Movie = require('../models/movie');
 
 class MovieService {
-    static async findById(movieId) {
-        return await Movie.findOne({ _id: movieId });
+    static findById(movieId) {
+        return Movie.findOne({ _id: movieId });
     }
 
     static getAll() {
