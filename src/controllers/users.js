@@ -1,120 +1,100 @@
 const router = require('express').Router();
-
 const User = require('../models/user');
+const { UserService } = require('../services/user');
 
 class UsersController {
-    static createUser(req, res) {
-        const body = req.body;
-
-        if (!body) {
-            return res.status(400).json({
-                success: false,
-                error: 'You must provide a user'
+    static async createUser(req, res) {
+        const user = new User(req.body);
+        try {
+            await UserService.createUser(user);
+            return res.status(201).json({
+                success: true,
+                id: user._id,
+                message: 'User created'
             });
+        } catch (err) {
+            return res.status(500).json({ errors: err });
         }
-
-        const user = new User(body);
-
-        if (!user) {
-            return res.status(400).json({ success: false, error: err });
-        }
-
-        user.save()
-            .then(() => {
-                return res.status(201).json({
-                    success: true,
-                    id: user._id,
-                    message: 'User created!'
-                });
-            })
-            .catch((error) => {
-                return res.status(400).json({
-                    error,
-                    message: 'User not created!'
-                });
-            });
     }
 
     static async updateUser(req, res) {
         const body = req.body;
 
-        if (!body) {
-            return res.status(400).json({
-                success: false,
-                error: 'You must provide a body to update'
-            });
-        }
+        try {
+            const user = await UserService.findById(req.params.id);
 
-        User.findOne({ _id: req.params.id }, (err, user) => {
-            if (err) {
+            if (!user) {
                 return res.status(404).json({
                     err,
                     message: 'User not found!'
                 });
             }
+
             user.name = body.name;
             user.lastName = body.lastName;
-
             user.email = body.email;
 
-            user.save()
-                .then(() => {
-                    return res.status(200).json({
-                        success: true,
-                        id: user._id,
-                        message: 'User updated!'
-                    });
-                })
-                .catch((error) => {
-                    return res.status(404).json({
-                        error,
-                        message: 'User not updated!'
-                    });
-                });
-        });
+            const updatedUser = await UserService.updateUser(user);
+
+            const result = {
+                success: true,
+                user: updatedUser,
+                message: 'User updated!'
+            };
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return res.status(500).json({ errors: err });
+        }
     }
 
     static async deleteUser(req, res) {
         try {
-            const user = await User.findOneAndDelete({});
+            const user = await UserService.findById(req.params.id);
             if (!user) {
                 return res
                     .status(404)
-                    .json({ success: false, error: `User not found` });
+                    .json({ success: false, error: 'User not found' });
             }
-
-            return res.status(200).json({ success: true, data: user });
+            await UserService.deleteUser(user._id);
+            return res.status(200).json({
+                success: true,
+                id: user._id,
+                message: 'User deleted!'
+            });
         } catch (err) {
-            res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: err });
         }
     }
 
     static async getUserById(req, res) {
         try {
-            const user = await User.findOne({});
+            const user = await UserService.findById(req.params.id);
             if (!user) {
                 return res
                     .status(404)
                     .json({ success: false, error: `User not found` });
             }
+
             return res.status(200).json({ success: true, data: user });
         } catch (err) {
-            res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: err });
         }
     }
 
     static async getUsers(req, res) {
         try {
-            const users = await User.find({});
+            const users = await UserService.getUsers();
 
             if (!users.length) {
                 return res
                     .status(404)
                     .json({ success: false, error: `User not found` });
             }
+
             return res.status(200).json({ success: true, data: users });
         } catch (err) {
-            res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: err });
         }
     }
 }
