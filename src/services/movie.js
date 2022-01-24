@@ -5,22 +5,22 @@ class MovieService {
         return await Movie.findOne({ _id: movieId });
     }
 
-    static async getAll() {
-        return await Movie.find({});
+    static getAll() {
+        return Movie.find({});
     }
 
-    static async create(movie) {
-        return await Movie.create(movie);
+    static create(movie) {
+        return Movie.create(movie);
     }
 
-    static async update(movie) {
-        return await Movie.findOneAndUpdate({ _id: movie._id }, movie, {
+    static update(movie) {
+        return Movie.findOneAndUpdate({ _id: movie._id }, movie, {
             new: true
         });
     }
 
-    static async delete(movieId) {
-        await Movie.deleteOne({ _id: movieId });
+    static delete(movieId) {
+        Movie.deleteOne({ _id: movieId });
     }
 }
 
