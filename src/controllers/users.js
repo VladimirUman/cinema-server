@@ -49,12 +49,14 @@ class UsersController {
     }
 
     static async deleteUser(req, res) {
+        const userId = req.params.id;
+        if (!userId) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
         try {
             const user = await UserService.findById(req.params.id);
             if (!user) {
-                return res
-                    .status(404)
-                    .json({ success: false, error: 'User not found' });
+                return res.status(404).json({ success: false, error: 'User not found' });
             }
             await UserService.deleteUser(user._id);
             return res.status(200).json({
@@ -68,12 +70,14 @@ class UsersController {
     }
 
     static async getUserById(req, res) {
+        const userId = req.params.id;
+        if (!userId) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
         try {
             const user = await UserService.findById(req.params.id);
             if (!user) {
-                return res
-                    .status(404)
-                    .json({ success: false, error: `User not found` });
+                return res.status(404).json({ success: false, error: `User not found` });
             }
 
             return res.status(200).json({ success: true, data: user });
@@ -87,9 +91,7 @@ class UsersController {
             const users = await UserService.getUsers();
 
             if (!users.length) {
-                return res
-                    .status(404)
-                    .json({ success: false, error: `User not found` });
+                return res.status(404).json({ success: false, error: `User not found` });
             }
 
             return res.status(200).json({ success: true, data: users });
