@@ -1,94 +1,59 @@
-const router = require('express').Router();
-
 const Movie = require('../models/movie');
+const { MovieService } = require('../services/movie');
 
 class MoviesController {
-    get router() {
-        router.post('/movie', this.createMovie);
-        router.put('/movie/:id', this.updateMovie);
-        router.delete('/movie/:id', this.deleteMovie);
-        router.get('/movie/:id', this.getMovieById);
-        router.get('/movies', this.getMovies);
+    static async createMovie(req, res) {
+        const movie = new Movie(req.body);
 
-        return router;
+        try {
+            const newMovie = await MovieService.create(movie);
+
+            const result = {
+                success: true,
+                movie: newMovie,
+                message: 'Movie created!'
+            };
+
+            return res.status(201).json(result);
+        } catch (err) {
+            return res.status(500).json({ errors: err });
+        }
     }
 
-    createMovie(req, res) {
+    static async updateMovie(req, res) {
         const body = req.body;
 
-        if (!body) {
-            return res.status(400).json({
-                success: false,
-                error: 'You must provide a movie'
-            });
-        }
+        try {
+            const movie = await MovieService.findById(req.params.id);
 
-        const movie = new Movie(body);
-
-        if (!movie) {
-            return res.status(400).json({ success: false, error: err });
-        }
-
-        movie
-            .save()
-            .then(() => {
-                return res.status(201).json({
-                    success: true,
-                    id: movie._id,
-                    message: 'Movie created!'
-                });
-            })
-            .catch((error) => {
-                return res.status(400).json({
-                    error,
-                    message: 'Movie not created!'
-                });
-            });
-    }
-
-    async updateMovie(req, res) {
-        const body = req.body;
-
-        if (!body) {
-            return res.status(400).json({
-                success: false,
-                error: 'You must provide a body to update'
-            });
-        }
-
-        Movie.findOne({ _id: req.params.id }, (err, movie) => {
-            if (err) {
+            if (!movie) {
                 return res.status(404).json({
                     err,
                     message: 'Movie not found!'
                 });
             }
+
             movie.name = body.name;
             movie.time = body.time;
             movie.rating = body.rating;
-            movie
-                .save()
-                .then(() => {
-                    return res.status(200).json({
-                        success: true,
-                        id: movie._id,
-                        message: 'Movie updated!'
-                    });
-                })
-                .catch((error) => {
-                    return res.status(404).json({
-                        error,
-                        message: 'Movie not updated!'
-                    });
-                });
-        });
+
+            const updatedMovie = await MovieService.update(movie);
+
+            const result = {
+                success: true,
+                movie: updatedMovie,
+                message: 'Movie updated!'
+            };
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return res.status(500).json({ errors: err });
+        }
     }
 
-    async deleteMovie(req, res) {
-        await Movie.findOneAndDelete({ _id: req.params.id }, (err, movie) => {
-            if (err) {
-                return res.status(400).json({ success: false, error: err });
-            }
+    static async deleteMovie(req, res) {
+        try {
+            const movie = await MovieService.findById(req.params.id);
 
             if (!movie) {
                 return res
@@ -96,43 +61,49 @@ class MoviesController {
                     .json({ success: false, error: `Movie not found` });
             }
 
-            return res.status(200).json({ success: true, data: movie });
-        })
-            .clone()
-            .catch((err) => console.log(err));
+            await MovieService.delete(movie._id);
+
+            const result = {
+                success: true,
+                id: movie._id,
+                message: 'Movie deleted!'
+            };
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return res.status(500).json({ errors: err });
+        }
     }
 
-    async getMovieById(req, res) {
-        await Movie.findOne({ _id: req.params.id }, (err, movie) => {
-            if (err) {
-                return res.status(400).json({ success: false, error: err });
-            }
-
+    static async getMovieById(req, res) {
+        try {
+            const movie = await MovieService.findById(req.params.id);
             if (!movie) {
                 return res
                     .status(404)
                     .json({ success: false, error: `Movie not found` });
             }
+
             return res.status(200).json({ success: true, data: movie });
-        })
-            .clone()
-            .catch((err) => console.log(err));
+        } catch (err) {
+            return res.status(500).json({ errors: err });
+        }
     }
 
-    async getMovies(req, res) {
-        await Movie.find({}, (err, movies) => {
-            if (err) {
-                return res.status(400).json({ success: false, error: err });
-            }
+    static async getMovies(req, res) {
+        try {
+            const movies = await MovieService.getAll();
+
             if (!movies.length) {
                 return res
                     .status(404)
                     .json({ success: false, error: `Movie not found` });
             }
+
             return res.status(200).json({ success: true, data: movies });
-        })
-            .clone()
-            .catch((err) => console.log(err));
+        } catch (err) {
+            return res.status(500).json({ errors: err });
+        }
     }
 }
 
