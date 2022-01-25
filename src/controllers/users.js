@@ -98,29 +98,6 @@ class UsersController {
             return res.status(500).json({ errors: err });
         }
     }
-
-    static async changePassword(req, res) {
-        const cuurentUser = req.cuurentUser;
-        const { oldPassword, newPassword } = req.body;
-
-        try {
-            user.name = body.name;
-            user.lastName = body.lastName;
-            user.email = body.email;
-
-            const updatedUser = await UserService.updateUser(user);
-
-            const result = {
-                success: true,
-                user: updatedUser,
-                message: 'User updated!'
-            };
-
-            return res.status(200).json(result);
-        } catch (err) {
-            return res.status(500).json({ errors: err });
-        }
-    }
 }
 
 module.exports = { UsersController };
