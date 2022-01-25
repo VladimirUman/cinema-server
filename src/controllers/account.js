@@ -1,10 +1,9 @@
-const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
 
-const { UserService } = require('../services/user');
-const User = require('../models/user');
 const { createJWT } = require('../utils/auth');
 const { sendConfirmToken } = require('../utils/mailer');
+const { UserService } = require('../services/user');
+const { SessionService } = require('../services/session');
 
 class AccountController {
     static async changePassword(req, res) {
@@ -20,7 +19,7 @@ class AccountController {
                 });
             }
 
-            const isMatch = bcrypt.compare(oldPassword, user.password);
+            const isMatch = await bcrypt.compare(oldPassword, user.password);
 
             if (!isMatch) {
                 return res.status(403).json({
@@ -31,6 +30,7 @@ class AccountController {
 
             user.password = await bcrypt.hash(newPassword, 10);
 
+            await SessionService.removeAllSessionsByUser(user._id);
             await UserService.updateUser(user);
 
             return res.status(200).json({
@@ -66,6 +66,26 @@ class AccountController {
         } catch (err) {
             console.log(err);
             res.status(500).json({ errors: err });
+        }
+    }
+
+    static async getAccount(req, res) {
+        try {
+            const user = await UserService.findById(req.currentUser.id);
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'User not found'
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                user
+            });
+        } catch (err) {
+            return res.status(500).json({ errors: err });
         }
     }
 }
