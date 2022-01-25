@@ -1,13 +1,9 @@
 const { checkSchema } = require('express-validator');
 
+const { validationRules } = require('./common');
+
 const loginValidator = checkSchema({
-    password: {
-        in: ['body'],
-        isLength: {
-            errorMessage: 'Password should be at least 8 chars long',
-            options: { min: 8 }
-        }
-    },
+    password: validationRules.password,
     email: {
         in: ['body'],
         isEmail: {
@@ -17,13 +13,7 @@ const loginValidator = checkSchema({
 });
 
 const registrationValidator = checkSchema({
-    password: {
-        in: ['body'],
-        isLength: {
-            errorMessage: 'Password should be at least 8 chars long',
-            options: { min: 8 }
-        }
-    },
+    password: validationRules.password,
     email: {
         in: ['body'],
         isEmail: {
@@ -35,8 +25,7 @@ const registrationValidator = checkSchema({
         isString: true,
         isLength: {
             options: { min: 3, max: 50 },
-            errorMessage:
-                'Length of the value should be within 3 and 50 symbols'
+            errorMessage: 'Length of the value should be within 3 and 50 symbols'
         }
     },
     lastName: {
@@ -44,8 +33,7 @@ const registrationValidator = checkSchema({
         isString: true,
         isLength: {
             options: { min: 3, max: 50 },
-            errorMessage:
-                'Length of the value should be within 3 and 50 symbols'
+            errorMessage: 'Length of the value should be within 3 and 50 symbols'
         }
     }
 });

@@ -13,6 +13,10 @@ class SessionService {
         await refreshSession.save();
     }
 
+    static async removeAllSessionsByUser(userId) {
+        Session.remove({ userId: userId });
+    }
+
     static async removeRefreshSession(refreshToken) {
         Session.remove({ refreshToken: refreshToken });
     }

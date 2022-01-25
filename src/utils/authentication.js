@@ -18,7 +18,11 @@ exports.authenticate = (req, res, next) => {
                 expiresIn: Number(tokenData.exp)
             };
         } catch (error) {
-            return next(error);
+            if (error.code === 'TOKEN_EXPIRED_ERROR') {
+                return res.status(419).json({ message: 'Token expired' });
+            }
+
+            return res.status(401).json({ message: 'Unauthorized' });
         }
     }
 
