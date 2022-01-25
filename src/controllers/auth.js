@@ -153,6 +153,35 @@ class AuthController {
             res.status(500).json({ errors: err });
         }
     }
+
+    static async resetPassword(req, res) {
+        const { email } = req.body;
+
+        try {
+            const user = await UserService.findByEmail(email);
+
+            if (!user) {
+                return res.status(404).json({
+                    errors: 'not found user'
+                });
+            }
+
+            const resetPasswordToken = createJWT(user.email, user._id, 3600);
+
+            user.resetPasswordToken = resetPasswordToken;
+
+            await UserService.updateUser(user);
+
+            sendConfirmToken(email, user.name, resetPasswordToken);
+
+            return res.status(200).json({
+                success: true,
+                message: 'sent confirm token'
+            });
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
+    }
 }
 
 module.exports = { AuthController };
