@@ -131,6 +131,28 @@ class AuthController {
             res.status(500).json({ errors: err });
         }
     }
+
+    static async logout(req, res) {
+        const refreshToken = req.body.refreshToken;
+
+        if (!refreshToken) {
+            return res.status(403).json({
+                success: false,
+                message: 'Refresh token not provided.'
+            });
+        }
+
+        try {
+            await SessionService.removeRefreshSession(refreshToken);
+
+            return res.status(200).json({
+                success: true,
+                message: 'User is logged out from current session.'
+            });
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
+    }
 }
 
 module.exports = { AuthController };
