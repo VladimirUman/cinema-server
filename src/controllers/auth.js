@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const Session = require('../models/session');
 const { createJWT } = require('../utils/auth');
-const { sendConfirmToken } = require('../utils/mailer');
+const { sendConfirmToken, emailType } = require('../utils/mailer');
 const { SessionService } = require('../services/session');
 const { UserService } = require('../services/user');
 
@@ -36,7 +36,7 @@ class AuthController {
 
                 const newUser = await UserService.createUser(user);
 
-                sendConfirmToken(email, name, emailConfirmToken);
+                sendConfirmToken(email, name, emailConfirmToken, emailType.confirmRegistration);
 
                 return res.status(200).json({
                     success: true,
@@ -52,12 +52,16 @@ class AuthController {
     static async confirmRegistration(req, res) {
         const { emailConfirmToken } = req.body;
 
-        const tokenData = jwt.verify(emailConfirmToken, process.env.TOKEN_SECRET);
-
-        const userId = tokenData.userId;
-
         try {
-            const user = await UserService.findById(userId);
+            const tokenData = jwt.verify(emailConfirmToken, process.env.TOKEN_SECRET);
+
+            if (!tokenData) {
+                return res.status(400).json({
+                    errors: 'token incorrect or expired'
+                });
+            }
+
+            const user = await UserService.findById(tokenData.userId);
 
             if (!user) {
                 return res.status(404).json({
@@ -80,7 +84,6 @@ class AuthController {
                 }
             }
         } catch (err) {
-            console.log(err);
             return res.status(500).json({ errors: err });
         }
     }
@@ -172,11 +175,52 @@ class AuthController {
 
             await UserService.updateUser(user);
 
-            sendConfirmToken(email, user.name, resetPasswordToken);
+            sendConfirmToken(email, user.name, resetPasswordToken, emailType.confirmNewPassword);
 
             return res.status(200).json({
                 success: true,
                 message: 'sent confirm token'
+            });
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
+    }
+
+    static async confirmNewPassword(req, res) {
+        const { password, resetPasswordToken } = req.body;
+
+        try {
+            const tokenData = jwt.verify(resetPasswordToken, process.env.TOKEN_SECRET);
+
+            if (!tokenData) {
+                return res.status(400).json({
+                    errors: 'token incorrect or expired'
+                });
+            }
+
+            const user = await UserService.findById(tokenData.userId);
+
+            if (!user) {
+                return res.status(404).json({
+                    errors: 'user not found'
+                });
+            }
+
+            if (user.resetPasswordToken !== resetPasswordToken) {
+                return res.status(400).json({
+                    errors: 'token incorrect'
+                });
+            }
+
+            user.password = await bcrypt.hash(password, 10);
+            user.resetPasswordToken = null;
+
+            await UserService.updateUser(user);
+            await SessionService.removeAllSessionsByUser(user._id);
+
+            return res.status(200).json({
+                success: true,
+                message: 'password changed'
             });
         } catch (err) {
             res.status(500).json({ errors: err });
