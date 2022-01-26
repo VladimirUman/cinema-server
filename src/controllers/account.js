@@ -75,9 +75,15 @@ class AccountController {
     static async confirmEmail(req, res) {
         const { emailConfirmToken } = req.body;
         const tokenData = jwt.verify(emailConfirmToken, process.env.TOKEN_SECRET);
-        const userId = tokenData.userId;
 
         try {
+            const userId = tokenData.userId;
+
+            if (!tokenData) {
+                return res.status(404).json({
+                    errors: [{ tokenData: 'not existing' }]
+                });
+            }
             const user = await UserService.findById(userId);
             const newEmail = user.newEmail;
 
@@ -85,23 +91,21 @@ class AccountController {
                 return res.status(404).json({
                     errors: [{ user: 'not found' }]
                 });
-            } else {
-                if (user.emailConfirmToken !== emailConfirmToken) {
-                    return res.status(400).json({
-                        errors: [{ token: 'WRONG EMAIL CONFIRM TOKEN' }]
-                    });
-                } else {
-                    user.email = newEmail;
-                    user.emailConfirmToken = null;
-                    await UserService.updateUser(user);
-
-                    return res.status(200).json({
-                        success: true,
-                        userId: user.id,
-                        message: 'Email confirm'
-                    });
-                }
             }
+            if (user.emailConfirmToken !== emailConfirmToken) {
+                return res.status(400).json({
+                    errors: [{ token: 'WRONG EMAIL CONFIRM TOKEN' }]
+                });
+            }
+            user.email = newEmail;
+            user.emailConfirmToken = null;
+            await UserService.updateUser(user);
+
+            return res.status(200).json({
+                success: true,
+                userId: user.id,
+                message: 'Email confirm'
+            });
         } catch (err) {
             return res.status(500).json({ errors: err });
         }
