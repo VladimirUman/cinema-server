@@ -21,6 +21,9 @@ const User = new Schema(
         },
         emailConfirmToken: {
             type: String
+        },
+        resetPasswordToken: {
+            type: String
         }
     },
     {

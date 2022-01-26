@@ -4,22 +4,12 @@ const { validationRules } = require('./common');
 
 const loginValidator = checkSchema({
     password: validationRules.password,
-    email: {
-        in: ['body'],
-        isEmail: {
-            errorMessage: 'Value should be an email'
-        }
-    }
+    email: validationRules.email
 });
 
 const registrationValidator = checkSchema({
     password: validationRules.password,
-    email: {
-        in: ['body'],
-        isEmail: {
-            errorMessage: 'Value should be an email'
-        }
-    },
+    email: validationRules.email,
     name: {
         in: ['body'],
         isString: true,
@@ -38,4 +28,8 @@ const registrationValidator = checkSchema({
     }
 });
 
-module.exports = { loginValidator, registrationValidator };
+const resetPasswordValidator = checkSchema({
+    email: validationRules.email
+});
+
+module.exports = { loginValidator, registrationValidator, resetPasswordValidator };
