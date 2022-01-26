@@ -8,6 +8,7 @@ const { createJWT } = require('../utils/auth');
 const { sendConfirmToken, emailType } = require('../utils/mailer');
 const { SessionService } = require('../services/session');
 const { UserService } = require('../services/user');
+const { config } = require('../config/config');
 
 class AuthController {
     static async registraition(req, res) {
@@ -53,7 +54,7 @@ class AuthController {
         const { emailConfirmToken } = req.body;
 
         try {
-            const tokenData = jwt.verify(emailConfirmToken, process.env.TOKEN_SECRET);
+            const tokenData = jwt.verify(emailConfirmToken, config.development.tokenSecret);
 
             if (!tokenData) {
                 return res.status(400).json({
@@ -118,7 +119,7 @@ class AuthController {
                 const newRefreshSession = new Session({
                     refreshToken: uuidv4(),
                     userId: user.id,
-                    expiresIn: new Date().getTime() + process.env.TOKEN_REFRESH_EXP * 1000
+                    expiresIn: new Date().getTime() + config.development.tokenExp * 1000
                 });
 
                 await SessionService.addRefreshSession(newRefreshSession);
@@ -190,7 +191,7 @@ class AuthController {
         const { password, resetPasswordToken } = req.body;
 
         try {
-            const tokenData = jwt.verify(resetPasswordToken, process.env.TOKEN_SECRET);
+            const tokenData = jwt.verify(resetPasswordToken, config.development.tokenSecret);
 
             if (!tokenData) {
                 return res.status(400).json({
