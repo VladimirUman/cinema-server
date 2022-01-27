@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
 
 const bcrypt = require('bcrypt');
 
@@ -7,6 +6,7 @@ const { createJWT } = require('../utils/auth');
 const { sendConfirmToken, emailType } = require('../utils/mailer');
 const { UserService } = require('../services/user');
 const { SessionService } = require('../services/session');
+const { config } = require('../config/index');
 
 class AccountController {
     static async changePassword(req, res) {
@@ -74,7 +74,7 @@ class AccountController {
 
     static async confirmEmail(req, res) {
         const { emailConfirmToken } = req.body;
-        const tokenData = jwt.verify(emailConfirmToken, process.env.TOKEN_SECRET);
+        const tokenData = jwt.verify(emailConfirmToken, config.tokenSecret);
 
         try {
             const userId = tokenData?.userId;
