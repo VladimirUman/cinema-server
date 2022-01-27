@@ -31,7 +31,7 @@ class AuthController {
 
                 user.password = await bcrypt.hash(password, 10);
 
-                let emailConfirmToken = createJWT(user.email, user._id, 3600);
+                let emailConfirmToken = createJWT(user.email, user._id, config.tokenExp);
 
                 user.emailConfirmToken = emailConfirmToken;
 
@@ -114,7 +114,7 @@ class AuthController {
                     });
                 }
 
-                const accessToken = createJWT(user.email, user._id, 3600);
+                const accessToken = createJWT(user.email, user._id, config.tokenExp);
 
                 const newRefreshSession = new Session({
                     refreshToken: uuidv4(),
@@ -127,8 +127,7 @@ class AuthController {
                 return res.status(200).json({
                     success: true,
                     accessToken: accessToken,
-                    refreshToken: newRefreshSession.refreshToken,
-                    message: user
+                    refreshToken: newRefreshSession.refreshToken
                 });
             }
         } catch (err) {
@@ -138,13 +137,6 @@ class AuthController {
 
     static async logout(req, res) {
         const refreshToken = req.body.refreshToken;
-
-        if (!refreshToken) {
-            return res.status(403).json({
-                success: false,
-                message: 'Refresh token not provided.'
-            });
-        }
 
         try {
             await SessionService.removeRefreshSession(refreshToken);
@@ -170,7 +162,7 @@ class AuthController {
                 });
             }
 
-            const resetPasswordToken = createJWT(user.email, user._id, 3600);
+            const resetPasswordToken = createJWT(user.email, user._id, config.tokenExp);
 
             user.resetPasswordToken = resetPasswordToken;
 
@@ -222,6 +214,59 @@ class AuthController {
             return res.status(200).json({
                 success: true,
                 message: 'password changed'
+            });
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
+    }
+
+    static async refreshTokens(req, res) {
+        const refreshToken = req.body.refreshToken;
+
+        const timeNow = new Date().getTime();
+
+        try {
+            const oldRefreshSession = await SessionService.getRefreshSession(refreshToken);
+
+            if (!oldRefreshSession) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'token incorrect'
+                });
+            }
+
+            await SessionService.removeRefreshSession(refreshToken);
+
+            if (timeNow > oldRefreshSession.expiresIn) {
+                return res.status(419).json({
+                    success: false,
+                    message: 'Session expired'
+                });
+            }
+
+            const user = await UserService.findById(oldRefreshSession.userId);
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'user not found'
+                });
+            }
+
+            const newRefreshSession = new Session({
+                refreshToken: uuidv4(),
+                userId: user._id,
+                expiresIn: timeNow + config.tokenExp * 1000
+            });
+
+            await SessionService.addRefreshSession(newRefreshSession);
+
+            const accessToken = createJWT(user.email, user._id, config.tokenExp);
+
+            return res.status(200).json({
+                success: true,
+                accessToken: accessToken,
+                refreshToken: newRefreshSession.refreshToken
             });
         } catch (err) {
             res.status(500).json({ errors: err });

@@ -41,4 +41,18 @@ const confirmNewPasswordValidator = checkSchema({
     }
 });
 
-module.exports = { loginValidator, registrationValidator, resetPasswordValidator, confirmNewPasswordValidator };
+const refreshTokenValidator = checkSchema({
+    refreshToken: {
+        in: ['body'],
+        isString: true,
+        errorMessage: 'Value must exist'
+    }
+});
+
+module.exports = {
+    loginValidator,
+    registrationValidator,
+    resetPasswordValidator,
+    confirmNewPasswordValidator,
+    refreshTokenValidator
+};

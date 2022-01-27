@@ -6,11 +6,13 @@ const {
     loginValidator,
     registrationValidator,
     resetPasswordValidator,
-    confirmNewPasswordValidator
+    confirmNewPasswordValidator,
+    refreshTokenValidator
 } = require('../validations/auth');
 
 authRouter.route('/login').post(validation(loginValidator), AuthController.login);
-authRouter.route('/logout').post(AuthController.logout);
+authRouter.route('/logout').post(validation(refreshTokenValidator), AuthController.logout);
+authRouter.route('/refresh-tokens').post(validation(refreshTokenValidator), AuthController.refreshTokens);
 
 authRouter.route('/registration').post(validation(registrationValidator), AuthController.registraition);
 authRouter.route('/confirm-registration').post(AuthController.confirmRegistration);
