@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 
 const { createJWT } = require('../utils/auth');
-const { sendConfirmToken } = require('../utils/mailer');
+const { sendConfirmToken, emailType } = require('../utils/mailer');
 const { UserService } = require('../services/user');
 const { SessionService } = require('../services/session');
 
@@ -61,7 +61,7 @@ class AccountController {
             user.emailConfirmToken = emailConfirmToken;
             user.email = newEmail;
             await UserService.updateUser(user);
-            sendConfirmToken(newEmail, user.name, emailConfirmToken);
+            sendConfirmToken(newEmail, user.name, emailConfirmToken, emailType.confirmNewEmail);
 
             return res.status(200).json({
                 success: true

@@ -32,4 +32,13 @@ const resetPasswordValidator = checkSchema({
     email: validationRules.email
 });
 
-module.exports = { loginValidator, registrationValidator, resetPasswordValidator };
+const confirmNewPasswordValidator = checkSchema({
+    password: validationRules.password,
+    resetPasswordToken: {
+        in: ['body'],
+        isString: true,
+        errorMessage: 'Value must exist'
+    }
+});
+
+module.exports = { loginValidator, registrationValidator, resetPasswordValidator, confirmNewPasswordValidator };
