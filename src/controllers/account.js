@@ -77,11 +77,11 @@ class AccountController {
         const tokenData = jwt.verify(emailConfirmToken, process.env.TOKEN_SECRET);
 
         try {
-            const userId = tokenData.userId;
+            const userId = tokenData?.userId;
 
-            if (!tokenData) {
+            if (!userId) {
                 return res.status(404).json({
-                    errors: [{ tokenData: 'not existing' }]
+                    errors: [{ userId: 'not existing' }]
                 });
             }
             const user = await UserService.findById(userId);
