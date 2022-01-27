@@ -6,5 +6,8 @@ const changePasswordValidator = checkSchema({
     newPassword: validationRules.password,
     oldPassword: validationRules.password
 });
+const changeEmailValidator = checkSchema({
+    newEmail: validationRules.email
+});
 
-module.exports = { changePasswordValidator };
+module.exports = { changePasswordValidator, changeEmailValidator };

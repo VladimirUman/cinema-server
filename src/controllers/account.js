@@ -111,6 +111,26 @@ class AccountController {
         }
     }
 
+    static async cancelEmailChanging(req, res) {
+        try {
+            const user = await UserService.findById(req.currentUser.id);
+
+            if (!user) {
+                return res.status(404).json({
+                    errors: [{ user: 'not found' }]
+                });
+            }
+            (user.newEmail = null), (user.emailConfirmToken = null);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Email changing canceled!'
+            });
+        } catch (err) {
+            return res.status(200).json({ errors: err });
+        }
+    }
+
     static async getAccount(req, res) {
         try {
             const user = await UserService.findById(req.currentUser.id);
