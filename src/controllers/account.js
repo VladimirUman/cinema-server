@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
+
 const bcrypt = require('bcrypt');
 
 const { createJWT } = require('../utils/auth');
@@ -66,6 +69,45 @@ class AccountController {
         } catch (err) {
             console.log(err);
             res.status(500).json({ errors: err });
+        }
+    }
+
+    static async confirmEmail(req, res) {
+        const { emailConfirmToken } = req.body;
+        const tokenData = jwt.verify(emailConfirmToken, process.env.TOKEN_SECRET);
+
+        try {
+            const userId = tokenData?.userId;
+
+            if (!userId) {
+                return res.status(404).json({
+                    errors: [{ userId: 'not existing' }]
+                });
+            }
+            const user = await UserService.findById(userId);
+            const newEmail = user.newEmail;
+
+            if (!user) {
+                return res.status(404).json({
+                    errors: [{ user: 'not found' }]
+                });
+            }
+            if (user.emailConfirmToken !== emailConfirmToken) {
+                return res.status(400).json({
+                    errors: [{ token: 'WRONG EMAIL CONFIRM TOKEN' }]
+                });
+            }
+            user.email = newEmail;
+            user.emailConfirmToken = null;
+            await UserService.updateUser(user);
+
+            return res.status(200).json({
+                success: true,
+                userId: user.id,
+                message: 'Email confirm'
+            });
+        } catch (err) {
+            return res.status(500).json({ errors: err });
         }
     }
 

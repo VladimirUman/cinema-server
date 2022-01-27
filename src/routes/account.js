@@ -8,5 +8,6 @@ userRouter.route('/change-password').put(validation(changePasswordValidator), Ac
 userRouter.route('/').get(AccountController.getAccount);
 
 userRouter.route('/change-email').put(AccountController.changeEmail);
+userRouter.route('/confirm-email').post(AccountController.confirmEmail);
 
 module.exports = userRouter;
