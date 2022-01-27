@@ -18,7 +18,7 @@ exports.authenticate = (req, res, next) => {
                 expiresIn: Number(tokenData.exp)
             };
         } catch (error) {
-            if (error.code === 'TOKEN_EXPIRED_ERROR') {
+            if (error instanceof jwt.TokenExpiredError) {
                 return res.status(419).json({ message: 'Token expired' });
             }
 

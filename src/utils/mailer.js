@@ -1,6 +1,12 @@
 const nodemailer = require('nodemailer');
 
-exports.sendConfirmToken = (email, userName, emailConfirmToken) => {
+exports.emailType = {
+    confirmRegistration: 'registration',
+    confirmNewEmail: 'newEmail',
+    confirmNewPassword: 'newPassword'
+};
+
+exports.sendConfirmToken = (email, userName, token, type) => {
     const transporter = nodemailer.createTransport({
         host: 'smtp.mail.yahoo.com',
         port: 587,
@@ -14,11 +20,27 @@ exports.sendConfirmToken = (email, userName, emailConfirmToken) => {
         logger: true
     });
 
+    let emailSubject;
+
+    switch (type) {
+        case this.emailType.confirmRegistration:
+            emailSubject = 'Confirm registration';
+            break;
+
+        case this.emailType.confirmNewEmail:
+            emailSubject = 'Confirm new Email';
+            break;
+
+        case this.emailType.confirmNewPassword:
+            emailSubject = 'Confirm new Password';
+            break;
+    }
+
     const mailOptions = {
         from: 'testprojectnode31@yahoo.com',
         to: email,
-        subject: 'Confirmation registration',
-        html: `<b>Hello ${userName}! Confirm registration: http://localhost:3000/api/auth/confirm-email?emailConfirmToken=${emailConfirmToken}</b>`
+        subject: emailSubject,
+        html: `<b>Hello ${userName}! ${emailSubject}. Your token: ${token}</b>`
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
