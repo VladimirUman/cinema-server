@@ -2,18 +2,18 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
 
 const appRouter = require('./routes/index');
+const { config } = require('./config/index');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = config.port || 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect(process.env.DATABASE, { useNewUrlParser: true }).catch((e) => {
+mongoose.connect(config.database, { useNewUrlParser: true }).catch((e) => {
     console.error('Connection error', e.message);
 });
 

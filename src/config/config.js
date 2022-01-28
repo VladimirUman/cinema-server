@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-exports.config = {
+exports.configJson = {
     development: {
         database: process.env.DATABASE,
         port: process.env.PORT,

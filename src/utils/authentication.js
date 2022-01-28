@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 
+const { config } = require('../config/index');
+
 exports.authenticate = (req, res, next) => {
     const token = req.headers['authorization'] || req.headers['Authorization'];
 
@@ -9,7 +11,7 @@ exports.authenticate = (req, res, next) => {
 
     if (token) {
         try {
-            const tokenData = jwt.verify(token, process.env.TOKEN_SECRET);
+            const tokenData = jwt.verify(token, config.tokenSecret);
 
             req.currentUser = {
                 id: tokenData.userId,
