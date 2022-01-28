@@ -136,6 +136,30 @@ class AccountController {
         }
     }
 
+    static async resendConfirmNewEmailToken(req, res) {
+        const { email } = req.body;
+        try {
+            const user = await UserService.findByEmail(email);
+
+            if (!user) {
+                return res.status(404).json({
+                    errors: [{ user: 'not found' }]
+                });
+            }
+            const resendEmailNewToken = createJWT(user.email, user._id, 3600);
+            user.resendConfirmNewEmailToken = resendEmailNewToken;
+            await UserService.updateUser(user);
+            sendConfirmToken(email, user.name, resendEmailNewToken, emailType.confirmNewEmail);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Sent confirm new email token'
+            });
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
+    }
+
     static async getAccount(req, res) {
         try {
             const user = await UserService.findById(req.currentUser.id);
