@@ -112,6 +112,10 @@ class AccountController {
     }
 
     static async cancelEmailChanging(req, res) {
+        const currentUser = req.currentUser.id;
+        if (!currentUser) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
         try {
             const user = await UserService.findById(req.currentUser.id);
 
@@ -120,7 +124,8 @@ class AccountController {
                     errors: [{ user: 'not found' }]
                 });
             }
-            (user.newEmail = null), (user.emailConfirmToken = null);
+            user.newEmail = null;
+            user.emailConfirmToken = null;
 
             return res.status(200).json({
                 success: true,

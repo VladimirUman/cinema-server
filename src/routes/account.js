@@ -10,5 +10,6 @@ userRouter.route('/').get(AccountController.getAccount);
 userRouter.route('/change-email').put(validation(changeEmailValidator), AccountController.changeEmail);
 userRouter.route('/confirm-email').post(AccountController.confirmEmail);
 userRouter.route('/cancel-change-email').post(AccountController.cancelEmailChanging);
+userRouter.route('/resent-email-new-token').post(AccountController.resendConfirmNewEmailToken);
 
 module.exports = userRouter;
