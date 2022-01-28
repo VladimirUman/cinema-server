@@ -31,7 +31,7 @@ class AuthController {
 
                 user.password = await bcrypt.hash(password, 10);
 
-                let emailConfirmToken = createJWT(user.email, user._id, config.tokenExp);
+                let emailConfirmToken = createJWT(user.email, user._id, config.accessTokenExp);
 
                 user.emailConfirmToken = emailConfirmToken;
 
@@ -114,12 +114,12 @@ class AuthController {
                     });
                 }
 
-                const accessToken = createJWT(user.email, user._id, config.tokenExp);
+                const accessToken = createJWT(user.email, user._id, config.accessTokenExp);
 
                 const newRefreshSession = new Session({
                     refreshToken: uuidv4(),
                     userId: user.id,
-                    expiresIn: new Date().getTime() + config.tokenExp * 1000
+                    expiresIn: new Date().getTime() + config.refreshTokenExp * 1000
                 });
 
                 await SessionService.addRefreshSession(newRefreshSession);
@@ -150,6 +150,19 @@ class AuthController {
         }
     }
 
+    static async logoutAllSessions(req, res) {
+        try {
+            await SessionService.removeAllSessionsByUser(req.currentUser.id);
+
+            return res.status(200).json({
+                success: true,
+                message: 'User is logged out from all sessions.'
+            });
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
+    }
+
     static async resetPassword(req, res) {
         const { email } = req.body;
 
@@ -162,7 +175,7 @@ class AuthController {
                 });
             }
 
-            const resetPasswordToken = createJWT(user.email, user._id, config.tokenExp);
+            const resetPasswordToken = createJWT(user.email, user._id, config.accessTokenExp);
 
             user.resetPasswordToken = resetPasswordToken;
 
@@ -256,12 +269,12 @@ class AuthController {
             const newRefreshSession = new Session({
                 refreshToken: uuidv4(),
                 userId: user._id,
-                expiresIn: timeNow + config.tokenExp * 1000
+                expiresIn: timeNow + config.refreshTokenExp * 1000
             });
 
             await SessionService.addRefreshSession(newRefreshSession);
 
-            const accessToken = createJWT(user.email, user._id, config.tokenExp);
+            const accessToken = createJWT(user.email, user._id, config.accessTokenExp);
 
             return res.status(200).json({
                 success: true,

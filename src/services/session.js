@@ -1,4 +1,5 @@
 const Session = require('../models/session');
+const { config } = require('../config/index');
 
 class SessionService {
     static async addRefreshSession(refreshSession) {
@@ -6,7 +7,7 @@ class SessionService {
 
         const sessions = await Session.find({ userId: userId });
 
-        if (sessions.length >= process.env.TOKEN_REFRESH_COUNT) {
+        if (sessions.length >= config.refreshTokenCount) {
             await Session.deleteMany({ userId: userId });
         }
 
