@@ -10,6 +10,6 @@ exports.createJWT = (email, userId, duration) => {
     };
 
     return jwt.sign(payload, config.tokenSecret, {
-        expiresIn: duration
+        expiresIn: Number(duration)
     });
 };

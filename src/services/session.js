@@ -6,7 +6,7 @@ class SessionService {
 
         const sessions = await Session.find({ userId: userId });
 
-        if (sessions.length > process.env.TOKEN_REFRESH_COUNT) {
+        if (sessions.length >= process.env.TOKEN_REFRESH_COUNT) {
             await Session.deleteMany({ userId: userId });
         }
 
@@ -14,11 +14,15 @@ class SessionService {
     }
 
     static async removeAllSessionsByUser(userId) {
-        Session.deleteMany({ userId: userId });
+        await Session.deleteMany({ userId: userId });
     }
 
     static async removeRefreshSession(refreshToken) {
-        Session.deleteOne({ refreshToken: refreshToken });
+        await Session.deleteOne({ refreshToken: refreshToken });
+    }
+
+    static getRefreshSession(refreshToken) {
+        return Session.findOne({ refreshToken: refreshToken });
     }
 }
 
