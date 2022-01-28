@@ -150,6 +150,19 @@ class AuthController {
         }
     }
 
+    static async logoutAllSessions(req, res) {
+        try {
+            await SessionService.removeAllSessionsByUser(req.currentUser.id);
+
+            return res.status(200).json({
+                success: true,
+                message: 'User is logged out from all sessions.'
+            });
+        } catch (err) {
+            res.status(500).json({ errors: err });
+        }
+    }
+
     static async resetPassword(req, res) {
         const { email } = req.body;
 
