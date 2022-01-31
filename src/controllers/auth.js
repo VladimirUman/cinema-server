@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 
 const User = require('../models/user');
 const Session = require('../models/session');
-const { createJWT } = require('../utils/auth');
+const { createJWT, verifyJWT } = require('../utils/jwt');
 const { sendConfirmToken, emailType } = require('../utils/mailer');
 const { SessionService } = require('../services/session');
 const { UserService } = require('../services/user');
@@ -54,7 +54,7 @@ class AuthController {
         const { emailConfirmToken } = req.body;
 
         try {
-            const tokenData = jwt.verify(emailConfirmToken, config.tokenSecret);
+            const tokenData = verifyJWT(emailConfirmToken);
 
             if (!tokenData) {
                 return res.status(400).json({
@@ -196,7 +196,7 @@ class AuthController {
         const { password, resetPasswordToken } = req.body;
 
         try {
-            const tokenData = jwt.verify(resetPasswordToken, config.tokenSecret);
+            const tokenData = verifyJWT(resetPasswordToken);
 
             if (!tokenData) {
                 return res.status(400).json({

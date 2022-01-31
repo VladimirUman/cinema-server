@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { config } = require('../config/index');
 
 exports.emailType = {
     confirmRegistration: 'registration',
@@ -20,19 +21,23 @@ exports.sendConfirmToken = (email, userName, token, type) => {
         logger: true
     });
 
-    let emailSubject;
+    let emailSubject = '';
+    let linkUrl = '';
 
     switch (type) {
         case this.emailType.confirmRegistration:
             emailSubject = 'Confirm registration';
+            linkUrl = 'confirm-registration?emailConfirmToken';
             break;
 
         case this.emailType.confirmNewEmail:
             emailSubject = 'Confirm new Email';
+            linkUrl = 'confirm-email?emailConfirmToken';
             break;
 
         case this.emailType.confirmNewPassword:
             emailSubject = 'Confirm new Password';
+            linkUrl = 'confirm-new-password?resetPasswordToken';
             break;
     }
 
@@ -40,7 +45,8 @@ exports.sendConfirmToken = (email, userName, token, type) => {
         from: 'testprojectnode31@yahoo.com',
         to: email,
         subject: emailSubject,
-        html: `<b>Hello ${userName}! ${emailSubject}. Your token: ${token}</b>`
+        html: `<b>Hello ${userName}! ${emailSubject}.</b>
+            <br>Follow link: ${config.clientUrl}/${linkUrl}=${token}</br>`
     };
 
     transporter.sendMail(mailOptions, function (error, info) {

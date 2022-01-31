@@ -13,3 +13,11 @@ exports.createJWT = (email, userId, duration) => {
         expiresIn: Number(duration)
     });
 };
+
+exports.verifyJWT = (token) => {
+    try {
+        return jwt.verify(token, config.tokenSecret);
+    } catch (_) {
+        return;
+    }
+};
