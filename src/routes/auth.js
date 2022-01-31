@@ -8,7 +8,8 @@ const {
     registrationValidator,
     resetPasswordValidator,
     confirmNewPasswordValidator,
-    refreshTokenValidator
+    refreshTokenValidator,
+    emailTokenValidator
 } = require('../validations/auth');
 
 authRouter.route('/login').post(validation(loginValidator), AuthController.login);
@@ -17,7 +18,7 @@ authRouter.route('/refresh-tokens').post(validation(refreshTokenValidator), Auth
 authRouter.route('/logout-all-sessions').post(authenticate, AuthController.logoutAllSessions);
 
 authRouter.route('/registration').post(validation(registrationValidator), AuthController.registraition);
-authRouter.route('/confirm-registration').post(AuthController.confirmRegistration);
+authRouter.route('/confirm-registration').post(validation(emailTokenValidator), AuthController.confirmRegistration);
 
 authRouter.route('/reset-password').post(validation(resetPasswordValidator), AuthController.resetPassword);
 authRouter

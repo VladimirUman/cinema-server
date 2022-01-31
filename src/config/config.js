@@ -7,7 +7,8 @@ exports.configJson = {
         refreshTokenCount: process.env.TOKEN_REFRESH_COUNT,
         refreshTokenExp: process.env.TOKEN_REFRESH_EXP,
         accessTokenExp: process.env.TOKEN_ACCESS_EXP,
-        tokenSecret: process.env.TOKEN_SECRET
+        tokenSecret: process.env.TOKEN_SECRET,
+        clientUrl: process.env.CLIENT_URL
     },
 
     test: {
@@ -16,7 +17,8 @@ exports.configJson = {
         refreshTokenCount: process.env.TOKEN_REFRESH_COUNT,
         refreshTokenExp: process.env.TOKEN_REFRESH_EXP,
         accessTokenExp: process.env.TOKEN_ACCESS_EXP,
-        tokenSecret: process.env.TOKEN_SECRET
+        tokenSecret: process.env.TOKEN_SECRET,
+        clientUrl: process.env.CLIENT_URL
     },
 
     production: {
@@ -25,6 +27,7 @@ exports.configJson = {
         refreshTokenCount: process.env.TOKEN_REFRESH_COUNT,
         refreshTokenExp: process.env.TOKEN_REFRESH_EXP,
         accessTokenExp: process.env.TOKEN_ACCESS_EXP,
-        tokenSecret: process.env.TOKEN_SECRET
+        tokenSecret: process.env.TOKEN_SECRET,
+        clientUrl: process.env.CLIENT_URL
     }
 };

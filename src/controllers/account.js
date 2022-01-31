@@ -2,11 +2,10 @@ const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcrypt');
 
-const { createJWT } = require('../utils/auth');
+const { createJWT } = require('../utils/jwt');
 const { sendConfirmToken, emailType } = require('../utils/mailer');
 const { UserService } = require('../services/user');
 const { SessionService } = require('../services/session');
-const { config } = require('../config/index');
 
 class AccountController {
     static async changePassword(req, res) {
@@ -74,24 +73,28 @@ class AccountController {
 
     static async confirmEmail(req, res) {
         const { emailConfirmToken } = req.body;
-        const tokenData = jwt.verify(emailConfirmToken, config.tokenSecret);
 
         try {
-            const userId = tokenData?.userId;
+            const tokenData = verifyJWT(emailConfirmToken);
 
-            if (!userId) {
-                return res.status(404).json({
-                    errors: [{ userId: 'not existing' }]
+            if (!tokenData) {
+                return res.status(400).json({
+                    errors: 'token incorrect or expired'
                 });
             }
+
+            const userId = tokenData?.userId;
+
             const user = await UserService.findById(userId);
-            const newEmail = user.newEmail;
 
             if (!user) {
                 return res.status(404).json({
                     errors: [{ user: 'not found' }]
                 });
             }
+
+            const newEmail = user.newEmail;
+
             if (user.emailConfirmToken !== emailConfirmToken) {
                 return res.status(400).json({
                     errors: [{ token: 'WRONG EMAIL CONFIRM TOKEN' }]

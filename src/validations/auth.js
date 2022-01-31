@@ -49,10 +49,19 @@ const refreshTokenValidator = checkSchema({
     }
 });
 
+const emailTokenValidator = checkSchema({
+    emailConfirmToken: {
+        in: ['body'],
+        isString: true,
+        errorMessage: 'Value must exist'
+    }
+});
+
 module.exports = {
     loginValidator,
     registrationValidator,
     resetPasswordValidator,
     confirmNewPasswordValidator,
-    refreshTokenValidator
+    refreshTokenValidator,
+    emailTokenValidator
 };
