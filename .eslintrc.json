@@ -9,6 +9,8 @@
     },
     "rules": {
         "no-console": 0,
+        "no-undef": "error",
+        "no-unused-vars": "warn",
         "no-param-reassign": ["error", { "props": false }],
         "prefer-destructuring": 0,
         // "consistent-return": ["warn", { "treatUndefinedAsUnspecified": true }],
