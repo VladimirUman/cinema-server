@@ -24,7 +24,6 @@ class UsersController {
 
             if (!user) {
                 return res.status(404).json({
-                    err,
                     message: 'User not found!'
                 });
             }

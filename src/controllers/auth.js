@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 
@@ -57,7 +56,7 @@ class AuthController {
             const tokenData = verifyJWT(emailConfirmToken);
 
             if (!tokenData) {
-                return res.status(400).json({
+                return res.status(401).json({
                     errors: 'token incorrect or expired'
                 });
             }

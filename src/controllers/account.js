@@ -1,8 +1,6 @@
-const jwt = require('jsonwebtoken');
-
 const bcrypt = require('bcrypt');
 
-const { createJWT } = require('../utils/jwt');
+const { createJWT, verifyJWT } = require('../utils/jwt');
 const { sendConfirmToken, emailType } = require('../utils/mailer');
 const { UserService } = require('../services/user');
 const { SessionService } = require('../services/session');
