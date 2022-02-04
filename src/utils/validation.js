@@ -7,7 +7,7 @@ exports.validation = (schema) => {
         const validationErrors = validationResult(req);
 
         if (!validationErrors.isEmpty()) {
-            return res.status(400).json({ errors: validationErrors.array() });
+            return res.status(400).json({ validationErrors: validationErrors.array() });
         }
 
         return next();

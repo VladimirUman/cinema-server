@@ -6,7 +6,7 @@ exports.authenticate = (req, res, next) => {
     const token = req.headers['authorization'] || req.headers['Authorization'];
 
     if (!token) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(401).json({ errors: 'Unauthorized' });
     }
 
     if (token) {
@@ -21,10 +21,10 @@ exports.authenticate = (req, res, next) => {
             };
         } catch (error) {
             if (error instanceof jwt.TokenExpiredError) {
-                return res.status(419).json({ message: 'Token expired' });
+                return res.status(419).json({ errors: 'Token expired' });
             }
 
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({ errors: 'Unauthorized' });
         }
     }
 

@@ -9,7 +9,7 @@ exports.validationRules = {
     email: {
         in: ['body'],
         isEmail: {
-            errorMessage: 'Value should be an email'
+            errorMessage: 'Email should be correct'
         }
     }
 };

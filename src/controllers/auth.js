@@ -18,7 +18,7 @@ class AuthController {
 
             if (user) {
                 return res.status(422).json({
-                    errors: [{ user: 'email already exists' }]
+                    errors: 'user email already exists'
                 });
             } else {
                 const user = new User({
@@ -65,12 +65,12 @@ class AuthController {
 
             if (!user) {
                 return res.status(404).json({
-                    errors: [{ user: 'not found' }]
+                    errors: 'user not found'
                 });
             } else {
                 if (user.emailConfirmToken !== emailConfirmToken) {
                     return res.status(400).json({
-                        errors: [{ token: 'incorrect' }]
+                        errors: 'token incorrect'
                     });
                 } else {
                     user.emailConfirmToken = null;
@@ -96,12 +96,12 @@ class AuthController {
 
             if (!user) {
                 return res.status(404).json({
-                    errors: [{ user: 'not found' }]
+                    errors: 'user not found'
                 });
             } else {
                 if (user.emailConfirmToken) {
                     return res.status(403).json({
-                        errors: [{ user: 'finish registration' }]
+                        errors: 'finish registration'
                     });
                 }
 
@@ -109,7 +109,7 @@ class AuthController {
 
                 if (!isMatch) {
                     return res.status(400).json({
-                        errors: [{ password: 'incorrect' }]
+                        errors: 'password incorrect'
                     });
                 }
 
