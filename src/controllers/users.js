@@ -12,7 +12,7 @@ class UsersController {
                 message: 'User created'
             });
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -24,7 +24,7 @@ class UsersController {
 
             if (!user) {
                 return res.status(404).json({
-                    message: 'User not found!'
+                    errors: 'User not found!'
                 });
             }
 
@@ -42,19 +42,19 @@ class UsersController {
 
             return res.status(200).json(result);
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
     static async deleteUser(req, res) {
         const userId = req.params.id;
         if (!userId) {
-            return res.status(404).json({ success: false, error: 'User not found' });
+            return res.status(404).json({ success: false, errors: 'User not found' });
         }
         try {
             const user = await UserService.findById(req.params.id);
             if (!user) {
-                return res.status(404).json({ success: false, error: 'User not found' });
+                return res.status(404).json({ success: false, errors: 'User not found' });
             }
             await UserService.deleteUser(user._id);
             return res.status(200).json({
@@ -63,24 +63,24 @@ class UsersController {
                 message: 'User deleted!'
             });
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
     static async getUserById(req, res) {
         const userId = req.params.id;
         if (!userId) {
-            return res.status(404).json({ success: false, error: 'User not found' });
+            return res.status(404).json({ success: false, errors: 'User not found' });
         }
         try {
             const user = await UserService.findById(req.params.id);
             if (!user) {
-                return res.status(404).json({ success: false, error: `User not found` });
+                return res.status(404).json({ success: false, errors: `User not found` });
             }
 
             return res.status(200).json({ success: true, data: user });
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -89,12 +89,12 @@ class UsersController {
             const users = await UserService.getUsers();
 
             if (!users.length) {
-                return res.status(404).json({ success: false, error: `User not found` });
+                return res.status(404).json({ success: false, errors: `User not found` });
             }
 
             return res.status(200).json({ success: true, data: users });
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 }

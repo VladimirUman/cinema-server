@@ -11,7 +11,7 @@ const createUpdateValidator = checkSchema({
     },
     time: {
         in: ['body'],
-        errorMessage: 'Should be up to 10 values',
+        errorMessage: 'Time array be up to 10 values',
         isArray: {
             options: { max: 10 }
         }
@@ -22,7 +22,7 @@ const createUpdateValidator = checkSchema({
         custom: {
             options: (value) => {
                 if (!value.match(/^([0-9]{1,2}):([0-9]{2})$/)) {
-                    throw new Error('value should be in HH:MM format');
+                    throw new Error('Time should be in HH:MM format');
                 }
 
                 return true;
@@ -31,9 +31,9 @@ const createUpdateValidator = checkSchema({
     },
     rating: {
         in: ['body'],
-        isInt: {
+        isNumeric: {
             options: { min: 0, max: 10 },
-            errorMessage: 'Should be number from 0 to 10'
+            errorMessage: 'Rating should be number from 0 to 10'
         },
         toInt: true
     }

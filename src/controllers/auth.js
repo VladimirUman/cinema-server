@@ -45,7 +45,7 @@ class AuthController {
                 });
             }
         } catch (err) {
-            res.status(500).json({ errors: err });
+            res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -84,7 +84,7 @@ class AuthController {
                 }
             }
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -130,7 +130,7 @@ class AuthController {
                 });
             }
         } catch (err) {
-            res.status(500).json({ errors: err });
+            res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -145,7 +145,7 @@ class AuthController {
                 message: 'User is logged out from current session.'
             });
         } catch (err) {
-            res.status(500).json({ errors: err });
+            res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -158,7 +158,7 @@ class AuthController {
                 message: 'User is logged out from all sessions.'
             });
         } catch (err) {
-            res.status(500).json({ errors: err });
+            res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -187,7 +187,7 @@ class AuthController {
                 message: 'sent confirm token'
             });
         } catch (err) {
-            res.status(500).json({ errors: err });
+            res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -228,7 +228,7 @@ class AuthController {
                 message: 'password changed'
             });
         } catch (err) {
-            res.status(500).json({ errors: err });
+            res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -243,7 +243,7 @@ class AuthController {
             if (!oldRefreshSession) {
                 return res.status(400).json({
                     success: false,
-                    message: 'token incorrect'
+                    errors: 'token incorrect'
                 });
             }
 
@@ -252,7 +252,7 @@ class AuthController {
             if (timeNow > oldRefreshSession.expiresIn) {
                 return res.status(419).json({
                     success: false,
-                    message: 'Session expired'
+                    errors: 'Session expired'
                 });
             }
 
@@ -261,7 +261,7 @@ class AuthController {
             if (!user) {
                 return res.status(404).json({
                     success: false,
-                    message: 'user not found'
+                    errors: 'user not found'
                 });
             }
 
@@ -281,7 +281,7 @@ class AuthController {
                 refreshToken: newRefreshSession.refreshToken
             });
         } catch (err) {
-            res.status(500).json({ errors: err });
+            res.status(500).json({ errors: 'server errror' });
         }
     }
 }

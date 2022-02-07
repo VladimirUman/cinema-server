@@ -38,7 +38,7 @@ class AccountController {
                 message: 'Password changed'
             });
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -65,7 +65,7 @@ class AccountController {
             });
         } catch (err) {
             console.log(err);
-            res.status(500).json({ errors: err });
+            res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -87,7 +87,7 @@ class AccountController {
 
             if (!user) {
                 return res.status(404).json({
-                    errors: [{ user: 'not found' }]
+                    errors: 'user not found'
                 });
             }
 
@@ -95,7 +95,7 @@ class AccountController {
 
             if (user.emailConfirmToken !== emailConfirmToken) {
                 return res.status(400).json({
-                    errors: [{ token: 'WRONG EMAIL CONFIRM TOKEN' }]
+                    errors: 'WRONG EMAIL CONFIRM TOKEN'
                 });
             }
             user.email = newEmail;
@@ -108,21 +108,21 @@ class AccountController {
                 message: 'Email confirm'
             });
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
     static async cancelEmailChanging(req, res) {
         const currentUser = req.currentUser.id;
         if (!currentUser) {
-            return res.status(404).json({ success: false, error: 'User not found' });
+            return res.status(404).json({ success: false, errors: 'User not found' });
         }
         try {
             const user = await UserService.findById(req.currentUser.id);
 
             if (!user) {
                 return res.status(404).json({
-                    errors: [{ user: 'not found' }]
+                    errors: 'user not found'
                 });
             }
             user.newEmail = null;
@@ -133,7 +133,7 @@ class AccountController {
                 message: 'Email changing canceled!'
             });
         } catch (err) {
-            return res.status(200).json({ errors: err });
+            return res.status(200).json({ errors: 'server errror' });
         }
     }
 
@@ -144,7 +144,7 @@ class AccountController {
 
             if (!user) {
                 return res.status(404).json({
-                    errors: [{ user: 'not found' }]
+                    errors: 'user not found'
                 });
             }
             const resendEmailNewToken = createJWT(user.email, user._id, 3600);
@@ -157,7 +157,7 @@ class AccountController {
                 message: 'Sent confirm new email token'
             });
         } catch (err) {
-            res.status(500).json({ errors: err });
+            res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -168,7 +168,7 @@ class AccountController {
             if (!user) {
                 return res.status(404).json({
                     success: false,
-                    error: 'User not found'
+                    errors: 'User not found'
                 });
             }
 
@@ -177,7 +177,7 @@ class AccountController {
                 user
             });
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 }

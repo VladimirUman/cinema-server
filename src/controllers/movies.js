@@ -16,7 +16,7 @@ class MoviesController {
 
             return res.status(201).json(result);
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -28,7 +28,6 @@ class MoviesController {
 
             if (!movie) {
                 return res.status(404).json({
-                    err,
                     message: 'Movie not found!'
                 });
             }
@@ -47,7 +46,7 @@ class MoviesController {
 
             return res.status(200).json(result);
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -69,7 +68,7 @@ class MoviesController {
 
             return res.status(200).json(result);
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -82,7 +81,7 @@ class MoviesController {
 
             return res.status(200).json({ success: true, data: movie });
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 
@@ -96,7 +95,7 @@ class MoviesController {
 
             return res.status(200).json({ success: true, data: movies });
         } catch (err) {
-            return res.status(500).json({ errors: err });
+            return res.status(500).json({ errors: 'server errror' });
         }
     }
 }
