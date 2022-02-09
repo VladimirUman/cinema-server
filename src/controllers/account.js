@@ -15,7 +15,7 @@ class AccountController {
             if (!user) {
                 return res.status(404).json({
                     success: false,
-                    error: 'User not found'
+                    errors: 'User not found'
                 });
             }
 
@@ -24,7 +24,7 @@ class AccountController {
             if (!isMatch) {
                 return res.status(403).json({
                     success: false,
-                    message: 'Wrong old password'
+                    errors: 'Wrong old password'
                 });
             }
 
