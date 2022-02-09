@@ -27,17 +27,17 @@ exports.sendConfirmToken = (email, userName, token, type) => {
     switch (type) {
         case this.emailType.confirmRegistration:
             emailSubject = 'Confirm registration';
-            linkUrl = 'confirm-registration?emailConfirmToken';
+            linkUrl = 'auth/confirm-registration?emailConfirmToken';
             break;
 
         case this.emailType.confirmNewEmail:
             emailSubject = 'Confirm new Email';
-            linkUrl = 'confirm-email?emailConfirmToken';
+            linkUrl = 'account/confirm-new-email?emailConfirmToken';
             break;
 
         case this.emailType.confirmNewPassword:
             emailSubject = 'Confirm new Password';
-            linkUrl = 'confirm-new-password?resetPasswordToken';
+            linkUrl = 'auth/confirm-new-password?resetPasswordToken';
             break;
     }
 
