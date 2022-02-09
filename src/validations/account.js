@@ -10,4 +10,9 @@ const changeEmailValidator = checkSchema({
     newEmail: validationRules.email
 });
 
-module.exports = { changePasswordValidator, changeEmailValidator };
+const updateAccountValidator = checkSchema({
+    name: validationRules.name,
+    lastName: validationRules.lastName
+});
+
+module.exports = { changePasswordValidator, changeEmailValidator, updateAccountValidator };
