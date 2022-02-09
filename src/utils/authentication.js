@@ -15,7 +15,7 @@ exports.authenticate = (req, res, next) => {
 
             req.currentUser = {
                 id: tokenData.userId,
-                role: 'user',
+                role: tokenData.role,
                 email: tokenData.email,
                 expiresIn: Number(tokenData.exp)
             };

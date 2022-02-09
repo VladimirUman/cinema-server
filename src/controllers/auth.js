@@ -6,7 +6,7 @@ const Session = require('../models/session');
 const { createJWT, verifyJWT } = require('../utils/jwt');
 const { sendConfirmToken, emailType } = require('../utils/mailer');
 const { SessionService } = require('../services/session');
-const { UserService } = require('../services/user');
+const { UserService, Roles } = require('../services/user');
 const { config } = require('../config/index');
 
 class AuthController {
@@ -25,12 +25,13 @@ class AuthController {
                     name: name,
                     lastName: lastName,
                     email: email,
-                    password: password
+                    password: password,
+                    role: Roles.USER
                 });
 
                 user.password = await bcrypt.hash(password, 10);
 
-                let emailConfirmToken = createJWT(user.email, user._id, config.accessTokenExp);
+                let emailConfirmToken = createJWT(user, config.accessTokenExp);
 
                 user.emailConfirmToken = emailConfirmToken;
 
@@ -113,7 +114,7 @@ class AuthController {
                     });
                 }
 
-                const accessToken = createJWT(user.email, user._id, config.accessTokenExp);
+                const accessToken = createJWT(user, config.accessTokenExp);
 
                 const newRefreshSession = new Session({
                     refreshToken: uuidv4(),
@@ -174,7 +175,7 @@ class AuthController {
                 });
             }
 
-            const resetPasswordToken = createJWT(user.email, user._id, config.accessTokenExp);
+            const resetPasswordToken = createJWT(user, config.accessTokenExp);
 
             user.resetPasswordToken = resetPasswordToken;
 
@@ -273,7 +274,7 @@ class AuthController {
 
             await SessionService.addRefreshSession(newRefreshSession);
 
-            const accessToken = createJWT(user.email, user._id, config.accessTokenExp);
+            const accessToken = createJWT(user, config.accessTokenExp);
 
             return res.status(200).json({
                 success: true,

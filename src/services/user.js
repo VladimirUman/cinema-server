@@ -1,4 +1,7 @@
 const User = require('../models/user');
+
+const Roles = { ADMIN: 'admin', USER: 'user' };
+
 class UserService {
     static findById(userId) {
         return User.findOne({ _id: userId });
@@ -26,4 +29,4 @@ class UserService {
         return User.deleteOne({ _id: userId });
     }
 }
-module.exports = { UserService };
+module.exports = { UserService, Roles };
