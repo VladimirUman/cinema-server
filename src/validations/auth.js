@@ -10,22 +10,8 @@ const loginValidator = checkSchema({
 const registrationValidator = checkSchema({
     password: validationRules.password,
     email: validationRules.email,
-    name: {
-        in: ['body'],
-        isString: true,
-        isLength: {
-            options: { min: 3, max: 50 },
-            errorMessage: 'Length of the value should be within 3 and 50 symbols'
-        }
-    },
-    lastName: {
-        in: ['body'],
-        isString: true,
-        isLength: {
-            options: { min: 3, max: 50 },
-            errorMessage: 'Length of the value should be within 3 and 50 symbols'
-        }
-    }
+    name: validationRules.name,
+    lastName: validationRules.lastName
 });
 
 const resetPasswordValidator = checkSchema({

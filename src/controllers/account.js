@@ -180,6 +180,35 @@ class AccountController {
             return res.status(500).json({ errors: 'server errror' });
         }
     }
+
+    static async updateAccount(req, res) {
+        const body = req.body;
+
+        try {
+            const user = await UserService.findById(req.currentUser.id);
+
+            if (!user) {
+                return res.status(404).json({
+                    errors: 'User not found!'
+                });
+            }
+
+            user.name = body.name;
+            user.lastName = body.lastName;
+
+            const updatedUser = await UserService.updateUser(user);
+
+            const result = {
+                success: true,
+                user: updatedUser,
+                message: 'Account updated!'
+            };
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return res.status(500).json({ errors: 'server errror' });
+        }
+    }
 }
 
 module.exports = { AccountController };
