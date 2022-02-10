@@ -5,10 +5,10 @@ const userRouter = require('./users');
 const movieRouter = require('./movies');
 const accountRouter = require('./account');
 
-const { authenticate } = require('../utils/authentication');
+const { authenticate, authenticateAdmin } = require('../utils/authentication');
 
 appRouter.use('/auth', authRouter);
-appRouter.use('/users', authenticate, userRouter);
+appRouter.use('/users', authenticate, authenticateAdmin, userRouter);
 appRouter.use('/movies', authenticate, movieRouter);
 appRouter.use('/account', authenticate, accountRouter);
 
