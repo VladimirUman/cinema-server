@@ -50,11 +50,11 @@ class AccountController {
 
             if (existUser) {
                 return res.status(422).json({
-                    errors: [{ user: 'email already exist' }]
+                    errors: 'email already exist'
                 });
             }
-            const user = await UserService.findById(req.currentUser.id);
-            const emailConfirmToken = createJWT(newEmail, currentUserId, 3600);
+            const user = await UserService.findById(currentUserId);
+            const emailConfirmToken = createJWT(user, 3600);
             user.emailConfirmToken = emailConfirmToken;
             user.email = newEmail;
             await UserService.updateUser(user);
@@ -147,7 +147,7 @@ class AccountController {
                     errors: 'user not found'
                 });
             }
-            const resendEmailNewToken = createJWT(user.email, user._id, 3600);
+            const resendEmailNewToken = createJWT(user, 3600);
             user.resendConfirmNewEmailToken = resendEmailNewToken;
             await UserService.updateUser(user);
             sendConfirmToken(email, user.name, resendEmailNewToken, emailType.confirmNewEmail);

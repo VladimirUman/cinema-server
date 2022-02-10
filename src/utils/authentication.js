@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const { config } = require('../config/index');
+const { Roles } = require('../services/user');
 
 exports.authenticate = (req, res, next) => {
     const token = req.headers['authorization'] || req.headers['Authorization'];
@@ -15,7 +16,7 @@ exports.authenticate = (req, res, next) => {
 
             req.currentUser = {
                 id: tokenData.userId,
-                role: 'user',
+                role: tokenData.role,
                 email: tokenData.email,
                 expiresIn: Number(tokenData.exp)
             };
@@ -26,6 +27,16 @@ exports.authenticate = (req, res, next) => {
 
             return res.status(401).json({ errors: 'Unauthorized' });
         }
+    }
+
+    return next();
+};
+
+exports.authenticateAdmin = (req, res, next) => {
+    const currentUser = req.currentUser;
+
+    if (currentUser.role !== Roles.ADMIN) {
+        return res.status(403).json({ errors: 'Forbiden' });
     }
 
     return next();
